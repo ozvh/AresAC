@@ -47,6 +47,9 @@ quarantine/
 
 # Build output and dependency caches.
 dist/
+dist-public/
+ares-public-infinityfree.zip
+ares-public-site.zip
 node_modules/
 .vite/
 *.tsbuildinfo

@@ -18,6 +18,7 @@
  */
 import { useEffect, useState } from "react";
 import type { JSX } from "react";
+import { PUBLIC_SITE } from "./public-mode";
 import { Ic } from "./icons";
 
 /** The five numbered sections, in document order. */
@@ -101,10 +102,10 @@ export default function Header(): JSX.Element {
             DEVELOPMENT BUILD · <span className="text-volt tabular-nums">{now}</span>
           </div>
           <a
-            href="/request"
+            href={PUBLIC_SITE ? "#architecture" : "/request"}
             className="group flex items-center gap-2 border border-volt/40 bg-volt/10 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.22em] text-volt transition-all duration-300 hover:bg-volt hover:text-abyss hover:shadow-[0_0_30px_rgba(239,121,94,0.4)] clip-notch"
           >
-            Deploy
+            {PUBLIC_SITE ? "Explore" : "Deploy"}
             <Ic name="arrow-up-right" className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </a>
         </div>

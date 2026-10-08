@@ -18,7 +18,8 @@
     "preview": "vite preview",
     "security": "npm audit --audit-level=high",
     "security:secrets": "node --experimental-strip-types --no-warnings tools/secrets.ts",
-    "sentry:test": "node --experimental-strip-types --no-warnings tools/sentry-test.ts"
+    "sentry:test": "node --experimental-strip-types --no-warnings tools/sentry-test.ts",
+    "build:public": "vite build --mode public"
   },
   "dependencies": {
     "@sentry/react": "11.5.0",

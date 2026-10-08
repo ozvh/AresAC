@@ -18,6 +18,7 @@
  * that belongs in documentation rather than in a reproduction of someone else's footer.
  */
 import type { JSX } from "react";
+import { PUBLIC_SITE } from "./public-mode";
 import { Ic } from "./icons";
 import type { IconName } from "./icons";
 import { Reveal } from "./Reveal";
@@ -97,17 +98,16 @@ export default function Footer(): JSX.Element {
 
         <Reveal>
           <p className="mx-auto mt-8 max-w-xl text-lg leading-relaxed text-mist">
-            Ship a game where skill is the only exploit left. ARES integrates in days — and its driver comes with the
-            discipline a BSOD-free fleet demands.
+            {PUBLIC_SITE ? "ARES is in private development. The architecture shown here is a concept preview; client integrations and production validation are still in progress." : "Ship a game where skill is the only exploit left. ARES integrates in days — and its driver comes with the discipline a BSOD-free fleet demands."}
           </p>
         </Reveal>
 
         <Reveal className="mt-12 flex flex-wrap items-center justify-center gap-4">
           <a
-            href="/request"
+            href={PUBLIC_SITE ? "#architecture" : "/request"}
             className="group flex items-center gap-3 bg-volt px-8 py-4 font-mono text-xs font-semibold uppercase tracking-[0.24em] text-abyss transition-all duration-300 hover:shadow-[0_0_50px_rgba(239,121,94,0.5)] clip-notch"
           >
-            Request the build
+            {PUBLIC_SITE ? "Explore the architecture" : "Request the build"}
             <Ic name="arrow-up-right" className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </a>
           <a

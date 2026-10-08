@@ -18,7 +18,8 @@ contexts, breadcrumbs, variables, function names and source context. SDK-generat
 envelope metadata and the collector's network processing are separate from this
 application event filter. Original error messages are intentionally unavailable.
 
-Vite development uses the development environment; built assets use production.
+Vite development and full private builds do not initialize Sentry. The public preview
+from build:public reports to the production environment.
 Set VITE_SENTRY_ENABLED=false before starting/building Vite to disable initialization.
 The switch is public, not a secret; changes require a new frontend build. Never
 expose other credentials with the VITE_ prefix.
