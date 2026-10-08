@@ -1,0 +1,493 @@
+@import "tailwindcss";
+@import "./fonts.css";
+
+/* ------------------------------------------------------------------ *
+ *  VISUAL POSTURE — enforced, not merely intended.
+ *
+ *  Palette is flat monochrome: #000 ground, #0A0A0A panels, #FFF text,
+ *  #888 muted, #222 dividers. The three state colours are DATA, not
+ *  decoration: they may only appear where they encode a verdict or a
+ *  rejection class. Nothing else in this application is coloured.
+ *
+ *  There are no gradients, no blurs, no glass, no shadows and no
+ *  keyframe animations anywhere in this stylesheet. Motion is limited to
+ *  an 80 ms colour transition on interactive controls, which costs no
+ *  layout and no compositor work beyond a repaint.
+ * ------------------------------------------------------------------ */
+
+@theme {
+  --color-void: #000000;
+  --color-panel: #0a0a0a;
+  --color-panel2: #0f0f0f;
+  --color-line: #222222;
+  --color-line2: #333333;
+  --color-fg: #ffffff;
+  --color-dim: #888888;
+  --color-dimmer: #555555;
+
+  /* State channel. Reserved for verdicts and rejection classes. */
+  --color-clean: #00ff66;
+  --color-pending: #ffbb00;
+  --color-flagged: #ff3333;
+
+  /* One typeface. Local-first so there is no third-party font request and
+     therefore no render-blocking network hop and no reflow on font swap. */
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono", "Roboto Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+  --font-sans: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono", "Roboto Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+  --font-display: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace;
+}
+
+html {
+  color-scheme: dark;
+  background: var(--color-void);
+}
+
+body {
+  margin: 0;
+  background: var(--color-void);
+  color: var(--color-fg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+  font-variant-ligatures: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Structural restraint, turned into a rule the code cannot violate by accident. */
+*,
+*::before,
+*::after {
+  border-radius: 0;
+  box-shadow: none;
+  animation: none;
+}
+
+::selection {
+  background: #ffffff;
+  color: #000000;
+}
+
+/* Square, monochrome scrollbars. Always visible so that a panel gaining
+   content never shifts the text underneath it. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #333333 #0a0a0a;
+}
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: #333333;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #444444;
+}
+::-webkit-scrollbar-corner {
+  background: #0a0a0a;
+}
+
+/* Focus is an outline, never a glow. */
+:focus-visible {
+  outline: 1px solid #ffffff;
+  outline-offset: 1px;
+}
+
+/* The single permitted motion: colour only. */
+button,
+a,
+input,
+select {
+  transition: color 80ms linear, background-color 80ms linear, border-color 80ms linear;
+  font: inherit;
+  color: inherit;
+}
+
+input,
+select {
+  background: var(--color-panel);
+  border: 1px solid var(--color-line);
+  padding: 3px 6px;
+}
+input:focus,
+select:focus {
+  border-color: #666666;
+}
+
+button {
+  border: 1px solid var(--color-line);
+  background: transparent;
+  cursor: pointer;
+  padding: 3px 8px;
+}
+button:hover:not(:disabled) {
+  border-color: #666666;
+  background: #141414;
+}
+button:disabled {
+  color: var(--color-dimmer);
+  cursor: not-allowed;
+}
+
+/* Fixed-width numeric cells. Every readout in this console sits on a
+   monospaced grid so that a changing value cannot move its neighbours. */
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Data row height is fixed and shared by the virtualiser and the stylesheet,
+   so a row's measured height and its allotted height can never disagree. */
+.row-h {
+  height: 18px;
+  line-height: 18px;
+}
+
+/* ==================================================================== *
+ *  LANDING SURFACE — the marketing front.
+ *
+ *  This is a second visual world, reproduced from the build that was
+ *  deployed at https://01a116fb-32fc-7213-ad7e-40bee4cf26a5.arena.site/:
+ *  dark blue rather than black, coloured rather than monochrome, and in
+ *  motion. The console's posture above is not weakened by it — every rule
+ *  below either lives in a cascade layer the console never reaches, or is
+ *  scoped to the `.landing` root.
+ *
+ *  Two mechanics do the work, and both are about cascade layers:
+ *
+ *  1. TOKENS ARE VAR REFERENCES. Tailwind emits `.bg-panel` as
+ *     `background-color: var(--color-panel)`. Redefining a token on
+ *     `.landing` therefore retints every utility inside it while the
+ *     console keeps the value it already had. That is how `--color-panel`
+ *     can be #0a0a0a for the console and #0a101d for the landing without a
+ *     second stylesheet or a renamed utility.
+ *
+ *  2. REVERT-LAYER HANDS PROPERTIES BACK. The console's `*, *::before,
+ *     *::after` restraint and its `button` / `a` element rules are
+ *     UNLAYERED, and unlayered CSS outranks every layer. Without help, a
+ *     utility authored for the landing — `p-5` on a `<button>`, `text-volt`
+ *     on an `<a>` — loses to `button { padding: 3px 8px }` and
+ *     `a { color: inherit }`. `revert-layer` rolls such a declaration back
+ *     to the previous layer, which is the utilities layer, which is exactly
+ *     the value the original build resolved to. The console keeps its
+ *     element rules byte for byte.
+ * ==================================================================== */
+
+@theme {
+  /* Landing palette. None of these names exist in the console theme, so they are
+     purely additive. The four tokens that DO collide — --color-panel,
+     --color-line, --font-display, --font-mono — are redefined on .landing below
+     rather than here, so that the console keeps the value it shipped with. */
+  --color-abyss: #04060c;
+  --color-ink: #070b14;
+  --color-panel-2: #0d1424;
+  --color-line-2: #94b4ff2e;
+  --color-volt: #57e0ff;
+  --color-viol: #7a5cff;
+  --color-bolt: #ffc24b;
+  --color-blood: #ff4d5e;
+  --color-mint: #4ade80;
+  --color-mist: #9fb2d8;
+
+  /* Six animations, named here and keyed at the foot of this file. `animate-ping`
+     and `animate-bounce` are Tailwind defaults and are not redeclared. */
+  --animate-marquee: marquee 36s linear infinite;
+  --animate-scanline: scanline 9s linear infinite;
+  --animate-flicker: flicker 7s linear infinite;
+  --animate-pulse-ring: pulseRing 2.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  --animate-blink: blink 1.1s steps(2, start) infinite;
+  --animate-drift: drift 16s ease-in-out infinite alternate;
+}
+
+/* Custom utilities the landing markup names directly. They sit in the utilities
+   layer so that an ordinary utility class can still override them, which is how
+   they behaved in the build these classes were copied from. */
+@layer utilities {
+  /* One pixel of border, a 12px backdrop blur and a diagonal two-stop fill: the
+     panel behind the kernel detail, the adjudicator plaque and the log feed. */
+  .panel {
+    border: 1px solid var(--color-line);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    background: linear-gradient(160deg, #10182bb8, #080c16e6);
+  }
+
+  /* The clipped corner: 18px off two opposite corners, the shape that keeps this
+     page from being a field of rectangles. */
+  .clip-notch {
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+  }
+
+  /* Outline type. The stroke, not a shadow, is what makes the three stacked ZEUS
+     marks read as depth. */
+  .text-hollow {
+    color: transparent;
+    -webkit-text-stroke: 1.5px #9fb2d861;
+  }
+  .text-hollow-volt {
+    color: transparent;
+    -webkit-text-stroke: 1.5px #57e0ffa6;
+  }
+
+  .glow-volt {
+    box-shadow: 0 0 24px #57e0ff38, 0 0 90px #57e0ff14;
+  }
+
+  /* The faint 72px blueprint grid behind everything, faded out by a radial mask. */
+  .grid-lines {
+    background-image: linear-gradient(#94b4ff0b 1px, #0000 1px), linear-gradient(90deg, #94b4ff0b 1px, #0000 1px);
+    background-size: 72px 72px;
+    -webkit-mask-image: radial-gradient(90% 70% at 50% 30%, #000 30%, #0000 75%);
+    mask-image: radial-gradient(90% 70% at 50% 30%, #000 30%, #0000 75%);
+  }
+
+  /* Film grain over the whole page, at 5% and stepping four times a second. */
+  .grain::after {
+    content: "";
+    position: fixed;
+    inset: -100%;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grainShift 0.9s steps(4, end) infinite;
+  }
+
+  /* Two travelling marks on the ring stack and the adjudication spine. */
+  .packet-dot {
+    animation: packetY 3.1s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+  .spine-pulse {
+    animation: spinePulse 7s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+}
+
+/*
+ * Everything below is unlayered on purpose: it has to outrank the console's own
+ * unlayered rules. Nothing here is scoped wider than `.landing`.
+ */
+
+/*
+ * The landing's own values for the four tokens the console also owns. Scoping them
+ * to the root element of this surface means `font-display` inside the landing is
+ * Space Grotesk and `bg-panel` is the panel blue, while both remain what they were
+ * everywhere else in the application.
+ *
+ * The three typographic resets matter as much as the tokens: the console's body is
+ * 12px with tabular figures, and both are inherited. The original page inherited a
+ * 16px body and proportional figures from the browser.
+ */
+.landing {
+  --color-panel: #0a101d;
+  --color-line: #94b4ff1a;
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 16px;
+  line-height: 1.5;
+  font-variant-numeric: normal;
+}
+
+/*
+ * Hand the restrained properties back to the utilities layer. The console's
+ * `* { border-radius: 0; box-shadow: none; animation: none }` is what would
+ * otherwise flatten the landing's rounded dots, its glows and all six animations;
+ * `revert-layer` restores the value the utility classes (or the browser) would
+ * have given, exactly as in the original build. The root element is named
+ * explicitly because `*` selects descendants only, and the grain overlay is the
+ * root's own ::after.
+ */
+.landing,
+.landing::before,
+.landing::after,
+.landing *,
+.landing *::before,
+.landing *::after {
+  border-radius: revert-layer;
+  box-shadow: revert-layer;
+  animation: revert-layer;
+}
+
+/* Same idea for the console's element rules, which would otherwise outrank the
+   landing's own padding, border colours, link colours and 300ms transitions. */
+.landing a,
+.landing button,
+.landing input,
+.landing select {
+  border: revert-layer;
+  background: revert-layer;
+  padding: revert-layer;
+  color: revert-layer;
+  font: revert-layer;
+  transition: revert-layer;
+  cursor: revert-layer;
+}
+
+.landing :focus-visible {
+  outline: revert-layer;
+  outline-offset: revert-layer;
+}
+
+/* The page ground. Without this the overscroll area above and below the landing is
+   the console's pure black, one shade off its own abyss. */
+html:has(.landing),
+body:has(.landing) {
+  background: #04060c;
+}
+
+/*
+ * Keyframes. Declared at the top level rather than inside @theme so that every one
+ * of them is always emitted: the classes that use them are applied by markup this
+ * file cannot see, and a keyframe that is optimised away is a missing animation.
+ */
+@keyframes marquee {
+  0% {
+    transform: translate(0);
+  }
+  to {
+    transform: translate(-50%);
+  }
+}
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+@keyframes flicker {
+  0%,
+  to {
+    opacity: 1;
+  }
+  3% {
+    opacity: 0.55;
+  }
+  4% {
+    opacity: 1;
+  }
+  41% {
+    opacity: 1;
+  }
+  42% {
+    opacity: 0.4;
+  }
+  43.5% {
+    opacity: 1;
+  }
+  44% {
+    opacity: 0.8;
+  }
+  44.6% {
+    opacity: 1;
+  }
+}
+@keyframes pulseRing {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.1);
+  }
+}
+@keyframes packet {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  to {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+@keyframes dashmove {
+  to {
+    stroke-dashoffset: -24px;
+  }
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+@keyframes drift {
+  0% {
+    transform: translate(-2%, 1%) scale(1.06);
+  }
+  to {
+    transform: translate(2%, -1%) scale(1.12);
+  }
+}
+@keyframes rise {
+  0% {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes grainShift {
+  0% {
+    transform: translate(0);
+  }
+  25% {
+    transform: translate(-1.5%, 1%);
+  }
+  50% {
+    transform: translate(1%, -1.5%);
+  }
+  75% {
+    transform: translate(-1%, -0.5%);
+  }
+  to {
+    transform: translate(1.5%, 1%);
+  }
+}
+@keyframes packetY {
+  0% {
+    opacity: 0;
+    top: -6%;
+  }
+  10% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    top: 100%;
+  }
+}
+@keyframes spinePulse {
+  0% {
+    opacity: 0;
+    top: 0%;
+  }
+  6% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    top: 100%;
+  }
+}

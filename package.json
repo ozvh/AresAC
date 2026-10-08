@@ -1,0 +1,36 @@
+{
+  "name": "zeus-arbiter",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "ZEUS anti-cheat: server-side arbiter (authoritative) + monochrome operator console (zero-trust observer).",
+  "scripts": {
+    "dev": "infisical run --env=dev -- vite",
+    "arbiter": "infisical run --env=dev -- node --experimental-strip-types --no-warnings server/index.ts",
+    "dev:all": "infisical run --env=dev -- node --experimental-strip-types --no-warnings tools/dev.ts",
+    "demo:unity": "node --experimental-strip-types --no-warnings tools/unity-demo.ts",
+    "build": "vite build",
+    "start": "node --experimental-strip-types --no-warnings server/index.ts --serve-static=dist",
+    "start:prod": "infisical run --env=prod -- node --experimental-strip-types --no-warnings server/index.ts --serve-static=dist",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --no-warnings --test tests/*.test.ts",
+    "load": "node --experimental-strip-types --no-warnings tools/load.ts",
+    "preview": "vite preview",
+    "security": "npm audit --audit-level=high",
+    "security:secrets": "node --experimental-strip-types --no-warnings tools/secrets.ts"
+  },
+  "dependencies": {
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.1.17",
+    "@types/node": "22.19.17",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "5.1.1",
+    "tailwindcss": "4.1.17",
+    "typescript": "5.9.3",
+    "vite": "^7.3.7"
+  }
+}

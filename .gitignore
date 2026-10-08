@@ -1,0 +1,60 @@
+# Secrets. Never committed, in any form.
+#
+# There is no git repository in this working copy yet — this file exists so that the
+# first `git init && git add .` cannot publish a credential. The patterns below are the
+# ones that matter for this project specifically: the environment file, the arbiter's
+# databases, TLS material, and the build-request spool (which holds requester
+# correspondence and is the only place personal data is written to disk).
+.env
+.env.*
+!.env.example
+
+# `.infisical.json` is deliberately NOT ignored: `infisical init` writes the local project
+# link there, it contains no secret, and the team is meant to commit it. The values it
+# points at live in Infisical, not in this repository.
+
+# Operator overrides that a deployment may drop in beside the code.
+*.local
+*.local.*
+
+# TLS material, if a certificate is ever placed here for direct HTTPS.
+certs/
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Runtime state: SQLite databases and their journals, plus the WAL sidecars.
+.zeus-data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# The build-request spool and every process log. Logs may contain operator tokens and
+# requester addresses; they are artefacts of a running process, not source.
+.zeus-requests.log
+.zeus-*.log
+*.log
+
+# Upload quarantine. Anything a user sent us lands here and must never be published.
+uploads/
+quarantine/
+
+# Build output and dependency caches.
+dist/
+node_modules/
+.vite/
+*.tsbuildinfo
+
+# Editor and OS noise.
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local agent runtime state.
+.freebuff/
