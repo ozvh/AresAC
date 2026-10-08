@@ -252,7 +252,7 @@ export default function Scaling(): JSX.Element {
             Choose your ring. <span className="text-hollow">Know its price.</span>
           </h2>
           <p className="mt-6 max-w-xl text-base leading-relaxed text-mist md:text-lg">
-            No single layer is universal. ZEUS assumes each ring trades capability against risk — and engineers the
+            No single layer is universal. ARES assumes each ring trades capability against risk — and engineers the
             combination so the weaknesses cancel out.
           </p>
         </Reveal>
@@ -304,10 +304,10 @@ export default function Scaling(): JSX.Element {
                   <span className="h-2.5 w-2.5 rounded-full bg-mint/70"></span>
                 </div>
                 <span className="font-mono text-[10px] tracking-[0.22em] text-mist">
-                  zeus@olympus-arbiter — adjudication feed
+                  ares@olympus-arbiter — adjudication feed
                 </span>
                 <span className="hidden font-mono text-[10px] tracking-[0.14em] text-mist/50 sm:block">
-                  {"\\\\.\\pipe\\zeus_kmod"}
+                  {"\\\\.\\pipe\\ares_kmod"}
                 </span>
               </div>
 

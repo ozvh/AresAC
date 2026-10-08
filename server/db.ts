@@ -48,14 +48,14 @@ export const SESSION_TOUCH_MS = 15 * 60 * 1_000;
 
 /** Upload retention window, in days, from the environment. Stated in the privacy policy. */
 export function retentionDays(env: NodeJS.ProcessEnv): number {
-  const raw = Number(env["ZEUS_UPLOAD_RETENTION_DAYS"] ?? "30");
+  const raw = Number(env["ARES_UPLOAD_RETENTION_DAYS"] ?? "30");
   if (!Number.isFinite(raw) || raw < 1) return 30;
   return Math.min(365, Math.floor(raw));
 }
 
 /** Days before a renewal that the reminder goes out. */
 export function renewalNoticeDays(env: NodeJS.ProcessEnv): number {
-  const raw = Number(env["ZEUS_RENEWAL_NOTICE_DAYS"] ?? "14");
+  const raw = Number(env["ARES_RENEWAL_NOTICE_DAYS"] ?? "14");
   if (!Number.isFinite(raw) || raw < 1) return 14;
   return Math.min(90, Math.floor(raw));
 }

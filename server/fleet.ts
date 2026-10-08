@@ -344,7 +344,7 @@ export class Fleet {
     try {
       await fetch(`${this.#origin}/v1/ingest`, {
         method: "POST",
-        headers: { "content-type": "application/json", "x-zeus-sig": sig },
+        headers: { "content-type": "application/json", "x-ares-sig": sig },
         body,
         // The fleet must never hold a socket open past its usefulness.
         signal: AbortSignal.timeout(4_000),

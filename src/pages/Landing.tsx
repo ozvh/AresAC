@@ -37,7 +37,7 @@ export default function Landing(): JSX.Element {
      *
      * `grain` is not decoration either: its ::after is the fixed noise overlay, so the class
      * has to sit on an element that spans the page. `relative` gives the absolutely positioned
-     * hollow ZEUS marks at the foot something to resolve against.
+     * hollow ARES marks at the foot something to resolve against.
      */
     <div className="landing grain relative min-h-screen bg-abyss font-display text-white antialiased">
       <Backdrop />

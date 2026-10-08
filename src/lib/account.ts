@@ -65,7 +65,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 async function post(path: string, body: unknown, withCsrf: boolean): Promise<Outcome<unknown>> {
   const headers: Record<string, string> = { "content-type": "application/json" };
-  if (withCsrf) headers["x-zeus-csrf"] = csrf;
+  if (withCsrf) headers["x-ares-csrf"] = csrf;
   try {
     const res = await fetch(path, { method: "POST", headers, body: JSON.stringify(body) });
     const payload: unknown = await res.json().catch(() => null);

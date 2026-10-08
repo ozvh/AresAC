@@ -1,4 +1,6 @@
-# ZEUS — arbiter + operator console
+# Ares Anti Cheat
+
+See [the migration guide](docs/ARES_MIGRATION.md) for deployment compatibility and Unity script changes.
 
 A server-side anti-cheat adjudication engine, a marketing front that says what it does, and a
 monochrome console that observes it. The front is `/`; the console is `/console`.
@@ -114,14 +116,14 @@ npm run demo:unity -- --server-only # arbiter only, for a real Unity client
 ```
 
 With no Unity editor to hand, the stand-in (the default) plays the identical timeline from
-Node, so the console is never empty. Drop `unity/Assets/Zeus` into a Unity project and point it
+Node, so the console is never empty. Drop `unity/Assets/Ares` into a Unity project and point it
 at the same URL to watch the same verdict arrive from a game client.
 
 **The demo is provisioned by a published recipe, not by a transferred credential.** The
 production system has no external enrolment exchange — an agent key is derived from
-`ZEUS_MASTER_KEY` and a counter, and only the arbiter process holds it — so the demo arbiter
+`ARES_MASTER_KEY` and a counter, and only the arbiter process holds it — so the demo arbiter
 pins the master to the SHA-256 of a published passphrase and both sides derive the same three
-identities (`tools/demo-agents.ts` and `unity/Assets/Zeus/Scripts/ZeusWire.cs`). Anything
+identities (`tools/demo-agents.ts` and `unity/Assets/Ares/Scripts/AresWire.cs`). Anything
 derived from a published string is published, which is why this binds loopback only and why a
 real build needs the per-agent enrolment exchange the limitations above already name.
 `tests/unity-demo.test.ts` pins the recipe to the arbiter's own `AgentRegistry.enroll()` and
@@ -222,10 +224,10 @@ its threat model.
 | Variable | Meaning |
 |---|---|
 | `RESEND_API_KEY` | bearer credential; **absent means spool-only operation** |
-| `ZEUS_REQUEST_TO` | the fixed recipient |
-| `ZEUS_REQUEST_FROM` | sender; a verified domain is required to send from anything but the provider default |
-| `ZEUS_REQUEST_ENDPOINT` | relay endpoint |
-| `ZEUS_REQUEST_SPOOL` | spool file for mail that could not be handed to the relay |
+| `ARES_REQUEST_TO` | the fixed recipient |
+| `ARES_REQUEST_FROM` | sender; a verified domain is required to send from anything but the provider default |
+| `ARES_REQUEST_ENDPOINT` | relay endpoint |
+| `ARES_REQUEST_SPOOL` | spool file for mail that could not be handed to the relay |
 
 **A request is never lost to a configuration error.** With no key, on a 4xx answer, or when
 the relay is unreachable, the message is appended to the spool file — created 0600, never
@@ -270,7 +272,7 @@ it was created from the environment — flagged `must_change_password`, so every
 action is refused until that temporary credential is replaced.
 
 **Sessions are server-side records.** The browser holds an opaque random string in a
-`zeus_session` cookie; everything about the session — the owner, the role, the expiry,
+`ares_session` cookie; everything about the session — the owner, the role, the expiry,
 whether it is revoked — lives in the database. Nothing about authority is encoded in the
 value the client holds, so there is nothing in it to forge. That is what "no local auth
 token" means concretely: no bearer token in browser storage, no client-side JWT whose claims
@@ -280,10 +282,10 @@ the sessions table grants no ability to present a session.
 
 | Property | Setting |
 |---|---|
-| cookie | `zeus_session`, `HttpOnly`, `SameSite=Strict`, `Path=/`, no `Domain` |
-| `Secure` | added when `ZEUS_COOKIE_SECURE=1` — required in production, wrong on local HTTP |
+| cookie | `ares_session`, `HttpOnly`, `SameSite=Strict`, `Path=/`, no `Domain` |
+| `Secure` | added when `ARES_COOKIE_SECURE=1` — required in production, wrong on local HTTP |
 | lifetime | 7 days absolute, last-seen refreshed no more than once every 15 minutes |
-| CSRF | a synchroniser token, `x-zeus-csrf`, issued by `GET /v1/auth/me` and required on every mutation |
+| CSRF | a synchroniser token, `x-ares-csrf`, issued by `GET /v1/auth/me` and required on every mutation |
 | password | scrypt (N=16384, r=8, p=1), per-account salt, 12–200 characters, timing-safe comparison |
 | lockout | 8 failed sign-ins lock the account for 15 minutes |
 
@@ -336,7 +338,7 @@ in as many words.
 
 **A renewal notice precedes every renewal, exactly once per period.** The row stores the
 period end that was last warned about, which makes the guarantee "once per renewal" rather
-than "recently". The window is `ZEUS_RENEWAL_NOTICE_DAYS` (14 by default); the message is
+than "recently". The window is `ARES_RENEWAL_NOTICE_DAYS` (14 by default); the message is
 plain text with no tracking pixel and no rewritten link, and it states the plan, the date,
 the amount, and how to stop it.
 
@@ -349,7 +351,7 @@ formats, the leading bytes must not be a container or an executable *whatever th
 a declared type that disagrees with the content is refused, and a refusal never produces
 bytes to write. Accepted files are stored outside every served directory under a fresh random
 name with no extension, mode 0600, and no route serves them back. Every verdict, including a
-refusal, is recorded. Files are deleted `ZEUS_UPLOAD_RETENTION_DAYS` (30 by default) days
+refusal, is recorded. Files are deleted `ARES_UPLOAD_RETENTION_DAYS` (30 by default) days
 after upload by a sweeper that removes the file first and marks the row second.
 
 **The policy page.** `/privacy` describes this deployment rather than a template: what is
@@ -468,7 +470,7 @@ system. Observed worst case in the browser under the CAPACITY profile: ~1,000 DO
   sessions now exist for the `/signup`, `/login`, `/account` and `/admin` surfaces; the
   console's own read surfaces are still loopback-and-same-origin only.
 - **Agent enrolment is in-process.** Keys are derived from a master secret and a counter,
-  so the enrolled fleet is only stable while `ZEUS_MASTER_KEY` and enrolment order are
+  so the enrolled fleet is only stable while `ARES_MASTER_KEY` and enrolment order are
   stable. Real agents need a per-agent enrolment exchange. The Unity demo works around this
   for loopback only, with a published recipe — see the Unity demo section.
 - **The fleet is a simulator.** It trades through the real ingest path, but it lives in
@@ -514,7 +516,7 @@ src/pages/*            the landing page, signup, login, account, administration,
 src/landing/*          the landing's nine sections, generated icon set, reveals, backdrop, canvas
 src/fonts.css          @font-face for the two self-hosted families (public/fonts/*.woff2)
 public/fonts/*.woff2   Space Grotesk and JetBrains Mono, served from this origin
-public/images/*.jpg    the storm plate and the Zeus bust, taken from the original build
+public/images/*.jpg    the storm plate and the Ares bust, taken from the original build
 src/components/*       ten console panels (see CONSOLE.md for the panel conventions)
 tests/*                schema, doctrine, decoder and end-to-end HTTP suites
 tools/load.ts          measured throughput/latency harness
@@ -522,7 +524,7 @@ tools/dev.ts           runs arbiter + console together
 tools/secrets.ts       source scan for credentials and secrets reaching a log call
 tools/demo-agents.ts   the demo enrolment recipe, shared by the server, the test and the C#
 tools/unity-demo.ts    loopback demo arbiter: pinned demo master, three enrolled rings
-unity/Assets/Zeus/     Unity demo client: wire core, transport, scripted scenario
+unity/Assets/Ares/     Unity demo client: wire core, transport, scripted scenario
 unity/README.md        what the demo does, how to run it, and what is not verified
 tests/unity-demo.test.ts  recipe lock plus the ingest path end to end
 docs/SECURITY.md       deployed checklist: TLS, cookies, CORS, retention, audit, payments

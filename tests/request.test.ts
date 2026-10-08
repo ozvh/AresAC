@@ -119,13 +119,13 @@ let relay: Relay;
  * had a relay. Everything this suite needs is therefore established in a single place.
  */
 before(async () => {
-  spoolDir = await mkdtemp(path.join(os.tmpdir(), "zeus-request-"));
+  spoolDir = await mkdtemp(path.join(os.tmpdir(), "ares-request-"));
   relay = await startRelay();
 
   // A forwarded address is only honoured when the operator has declared a proxy, so
   // declaring one here is what lets each HTTP request below be charged to its own
   // source rather than to the socket every request shares.
-  process.env["ZEUS_TRUST_PROXY"] = "1";
+  process.env["ARES_TRUST_PROXY"] = "1";
 
   const registry = new AgentRegistry(Buffer.alloc(32, 7));
   const ledger = new Ledger();
@@ -152,7 +152,7 @@ before(async () => {
 });
 
 after(async () => {
-  delete process.env["ZEUS_TRUST_PROXY"];
+  delete process.env["ARES_TRUST_PROXY"];
   await new Promise<void>((resolve) => httpServer.close(() => resolve()));
   await relay.close();
 });
@@ -167,7 +167,7 @@ function harness(overrides: { apiKey?: string; endpoint?: string; recipient?: st
   const spool = path.join(spoolDir, `spool-${Math.random().toString(16).slice(2)}.log`);
   const mailer = new Mailer({
     apiKey: overrides.apiKey ?? "test-key",
-    from: overrides.from ?? "ZEUS Arbiter <onboarding@resend.dev>",
+    from: overrides.from ?? "ARES Arbiter <onboarding@resend.dev>",
     recipient: overrides.recipient ?? "cagelove094@gmail.com",
     endpoint: overrides.endpoint ?? relay.url,
     spoolPath: spool,
@@ -429,7 +429,7 @@ test("a configured recipient is the only address a request can reach", async () 
 });
 
 test("a header field cannot be made to carry a second header", async () => {
-  const h = harness({ from: "ZEUS\r\nBcc: victim@example.com <onboarding@resend.dev>" });
+  const h = harness({ from: "ARES\r\nBcc: victim@example.com <onboarding@resend.dev>" });
   const before = relay.captured.length;
   await h.intake.submit(payload(), "10.0.0.11", Date.now());
   const sent = relay.captured[before];
@@ -468,7 +468,7 @@ test("the relay neutralises a control byte it is handed directly", async () => {
     to: h.mailer.recipient,
     from: h.mailer.from,
     replyTo: null,
-    subject: "zeus relay self-test",
+    subject: "ares relay self-test",
     text: "first line\nsecond line\u0007broken",
   });
   assert.equal(outcome.relay, "DELIVERED");
@@ -600,8 +600,8 @@ test("the route throttles a source that keeps submitting", async () => {
 
 test("a forwarded address is ignored unless a proxy has been declared", async () => {
   const sealedBefore = sealedRequests(http.ledger).length;
-  const saved = process.env["ZEUS_TRUST_PROXY"];
-  delete process.env["ZEUS_TRUST_PROXY"];
+  const saved = process.env["ARES_TRUST_PROXY"];
+  delete process.env["ARES_TRUST_PROXY"];
   try {
     // With no proxy declared both submissions key on the socket instead, so the second
     // folds into the first. A caller cannot choose its own bucket by inventing a header.
@@ -614,8 +614,8 @@ test("a forwarded address is ignored unless a proxy has been declared", async ()
     assert.equal(b.ref, a.ref, "an undeclared forwarded address must not create a new source identity");
     assert.equal(sealedRequests(http.ledger).length, sealedBefore + 1);
   } finally {
-    if (saved === undefined) delete process.env["ZEUS_TRUST_PROXY"];
-    else process.env["ZEUS_TRUST_PROXY"] = saved;
+    if (saved === undefined) delete process.env["ARES_TRUST_PROXY"];
+    else process.env["ARES_TRUST_PROXY"] = saved;
   }
 });
 

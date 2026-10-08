@@ -26,6 +26,7 @@ certs/
 *.pfx
 
 # Runtime state: SQLite databases and their journals, plus the WAL sidecars.
+.ares-data/
 .zeus-data/
 *.db
 *.db-journal
@@ -36,8 +37,8 @@ certs/
 
 # The build-request spool and every process log. Logs may contain operator tokens and
 # requester addresses; they are artefacts of a running process, not source.
-.zeus-requests.log
-.zeus-*.log
+.ares-requests.log
+.ares-*.log
 *.log
 
 # Upload quarantine. Anything a user sent us lands here and must never be published.

@@ -61,7 +61,7 @@ test("password crypto rejects work above capacity and recovers after completion"
 });
 
 test("password-change attempts share a user budget across sessions and return429", async t => {
-  const root = await mkdtemp(path.join(os.tmpdir(), "zeus-resource-"));
+  const root = await mkdtemp(path.join(os.tmpdir(), "ares-resource-"));
   const system = bootstrap({ dbFile: ":memory:", uploadDir: root, sessions: 0, tps: 0, env: {} });
   const server = createArbiterServer({ runtime: system.runtime, consoleOrigins: [], staticDir: null });
   t.after(async () => {
@@ -79,14 +79,14 @@ test("password-change attempts share a user budget across sessions and return429
   const statuses: number[] = [];
   for (let i = 0; i < 8; i++) {
     const grant = i % 2 === 0 ? first.value : second.value;
-    const response = await fetch(url, { method: "POST", headers: { "content-type": "application/json", cookie: grant.cookie.split(";")[0]!, "x-zeus-csrf": grant.identity.csrf }, body: JSON.stringify({ current: "wrong", next: "Different-valid-secret-812!" }) });
+    const response = await fetch(url, { method: "POST", headers: { "content-type": "application/json", cookie: grant.cookie.split(";")[0]!, "x-ares-csrf": grant.identity.csrf }, body: JSON.stringify({ current: "wrong", next: "Different-valid-secret-812!" }) });
     statuses.push(response.status); await response.text();
   }
   assert.deepEqual(statuses, [401, 401, 401, 429, 429, 429, 429, 429]);
 });
 
 test("upload reservations bound concurrent users and retain quota until deletion succeeds", async t => {
-  const root = await mkdtemp(path.join(os.tmpdir(), "zeus-quota-"));
+  const root = await mkdtemp(path.join(os.tmpdir(), "ares-quota-"));
   let now = Date.now();
   const system = bootstrap({ dbFile: ":memory:", uploadDir: root, sessions: 0, tps: 0, env: {} });
   t.after(async () => { system.runtime.stop(); system.store.close(); assert.ok(root.startsWith(os.tmpdir() + path.sep)); await rm(root, { recursive: true, force: true }); });
@@ -115,7 +115,7 @@ test("upload reservations bound concurrent users and retain quota until deletion
 });
 
 test("failed upload writes retain reservations when cleanup fails", async t => {
-  const root = await mkdtemp(path.join(os.tmpdir(), "zeus-write-"));
+  const root = await mkdtemp(path.join(os.tmpdir(), "ares-write-"));
   const system = bootstrap({ dbFile: ":memory:", uploadDir: root, sessions: 0, tps: 0, env: {} });
   t.after(async () => { system.runtime.stop(); system.store.close(); assert.ok(root.startsWith(os.tmpdir() + path.sep)); await rm(root, { recursive: true, force: true }); });
   system.store.insertUser({ id: "one", email: "one@example.invalid", displayName: "one", role: "CUSTOMER", pwdHash: "unused", now: Date.now(), mustChangePassword: false });
@@ -134,7 +134,7 @@ test("failed upload writes retain reservations when cleanup fails", async t => {
 });
 
 test("refused upload metadata consumes file quota, and insert failure never writes bytes", async t => {
-  const root = await mkdtemp(path.join(os.tmpdir(), "zeus-metadata-"));
+  const root = await mkdtemp(path.join(os.tmpdir(), "ares-metadata-"));
   const system = bootstrap({ dbFile: ":memory:", uploadDir: root, sessions: 0, tps: 0, env: {} });
   t.after(async () => { system.runtime.stop(); system.store.close(); assert.ok(root.startsWith(os.tmpdir() + path.sep)); await rm(root, { recursive: true, force: true }); });
   for (const id of ["one", "two"]) system.store.insertUser({ id, email: `${id}@example.invalid`, displayName: id, role: "CUSTOMER", pwdHash: "unused", now: Date.now(), mustChangePassword: false });

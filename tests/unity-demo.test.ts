@@ -128,7 +128,7 @@ async function postAs(
   };
   const headers: Record<string, string> = { "content-type": "application/json" };
   const sig = options.sig === undefined ? demoSign(key, canonicalEvent(event)) : options.sig;
-  if (sig !== null) headers["x-zeus-sig"] = sig;
+  if (sig !== null) headers["x-ares-sig"] = sig;
 
   return fetch(`${running.base}/v1/ingest`, {
     method: "POST",

@@ -7,7 +7,7 @@
  */
 import { spawn, type ChildProcess } from "node:child_process";
 
-const PORT = process.env["ZEUS_PORT"] ?? "8787";
+const PORT = process.env["ARES_PORT"] ?? "8787";
 
 function launch(label: string, command: string, args: readonly string[]): ChildProcess {
   const child = spawn(command, [...args], {

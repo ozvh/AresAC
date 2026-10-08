@@ -1,11 +1,11 @@
 /**
- * ZEUS arbiter bootstrap.
+ * ARES arbiter bootstrap.
  *
  * Argument parsing, one call to the composition root, and a banner that states exactly
  * what an operator needs to know before trusting the process: which origins may talk to
  * it, where its keys came from, whether the mail relay is configured, and — the line that
  * matters most in production — whether any secret was generated for this process rather
- * than configured. A deployment that lost its `ZEUS_SESSION_KEY` still works, and an
+ * than configured. A deployment that lost its `ARES_SESSION_KEY` still works, and an
  * operator who is not told that will find out when everyone is signed out after a deploy.
  *
  * Every generated secret is printed for the operator's own use in the case of the operator
@@ -33,10 +33,10 @@ function parseArgs(argv: readonly string[], env: NodeJS.ProcessEnv): Options {
   const options: Options = {
     port: Number(env["PORT"] ?? DEFAULT_PORT),
     staticDir: null,
-    sessions: Number(env["ZEUS_SESSIONS"] ?? 6),
-    tps: Number(env["ZEUS_TPS"] ?? 60),
+    sessions: Number(env["ARES_SESSIONS"] ?? 6),
+    tps: Number(env["ARES_TPS"] ?? 60),
     fleetEnabled: true,
-    seed: Number(env["ZEUS_SEED"] ?? 0x5eed),
+    seed: Number(env["ARES_SEED"] ?? 0x5eed),
   };
   for (const arg of argv) {
     if (arg.startsWith("--port=")) options.port = Number(arg.slice("--port=".length));
@@ -65,11 +65,11 @@ type TlsMaterial = { readonly cert: Buffer; readonly key: Buffer };
  * enabled" is a plaintext listener that looks configured.
  */
 function resolveTls(env: NodeJS.ProcessEnv): { material: TlsMaterial | null; error: string | null } {
-  const certPath = (env["ZEUS_TLS_CERT"] ?? "").trim();
-  const keyPath = (env["ZEUS_TLS_KEY"] ?? "").trim();
+  const certPath = (env["ARES_TLS_CERT"] ?? "").trim();
+  const keyPath = (env["ARES_TLS_KEY"] ?? "").trim();
   if (certPath === "" && keyPath === "") return { material: null, error: null };
   if (certPath === "" || keyPath === "") {
-    return { material: null, error: "ZEUS_TLS_CERT and ZEUS_TLS_KEY must be set together" };
+    return { material: null, error: "ARES_TLS_CERT and ARES_TLS_KEY must be set together" };
   }
   try {
     return { material: { cert: readFileSync(certPath), key: readFileSync(keyPath) }, error: null };
@@ -82,7 +82,7 @@ function resolveTls(env: NodeJS.ProcessEnv): { material: TlsMaterial | null; err
 function main(): void {
   const options = parseArgs(process.argv.slice(2), process.env);
 
-  const origins = (process.env["ZEUS_CONSOLE_ORIGINS"] ?? DEFAULT_ORIGINS)
+  const origins = (process.env["ARES_CONSOLE_ORIGINS"] ?? DEFAULT_ORIGINS)
     .split(",")
     .map((entry) => entry.trim())
     .filter((entry) => entry.length > 0);
@@ -111,7 +111,7 @@ function main(): void {
     process.stderr.write(
       [
         "",
-        " ZEUS refused to start — the production configuration is not safe:",
+        " ARES refused to start — the production configuration is not safe:",
         ...fatal.map((entry) => ` [!] ${entry}`),
         "",
       ].join("\n"),
@@ -128,10 +128,10 @@ function main(): void {
 
   server.on("error", (error: NodeJS.ErrnoException) => {
     if (error.code === "EADDRINUSE") {
-      process.stderr.write(`[zeus] port ${options.port} is already bound; pass --port=<n>\n`);
+      process.stderr.write(`[ares] port ${options.port} is already bound; pass --port=<n>\n`);
       process.exit(2);
     }
-    process.stderr.write(`[zeus] server error: ${error.message}\n`);
+    process.stderr.write(`[ares] server error: ${error.message}\n`);
     process.exit(1);
   });
 
@@ -153,7 +153,7 @@ function main(): void {
     process.stdout.write(
       [
         line,
-        " ZEUS arbiter — authoritative conviction engine",
+        " ARES arbiter — authoritative conviction engine",
         line,
         // The scheme is stated rather than assumed: an operator reading `http://` on a
         // listener that is actually speaking TLS would reasonably conclude the opposite of
@@ -161,7 +161,7 @@ function main(): void {
         ` listen        ${tls.material === null ? "http" : "https"}://127.0.0.1:${options.port}   (loopback only)`,
         ` agents        ${system.registry.size} provisioned across ${options.sessions} session(s)`,
         ` key idiom     ${system.registry.fingerprint}`,
-        ` operator tok  ${process.env["ZEUS_OPERATOR_TOKEN"] === undefined ? runtime.operatorToken : "from environment (ZEUS_OPERATOR_TOKEN)"}`,
+        ` operator tok  ${process.env["ARES_OPERATOR_TOKEN"] === undefined ? runtime.operatorToken : "from environment (ARES_OPERATOR_TOKEN)"}`,
         ` origins       ${origins.join(" ")}`,
         ` static dir    ${options.staticDir ?? "(none — API only)"}`,
         ` transport     ${tls.material === null ? "http (plaintext — terminate TLS at a proxy)" : "https (TLS on this listener)"}`,
@@ -187,7 +187,7 @@ function main(): void {
   });
 
   const shutdown = (signal: string): void => {
-    process.stdout.write(`\n[zeus] ${signal} — sealing ledger and stopping\n`);
+    process.stdout.write(`\n[ares] ${signal} — sealing ledger and stopping\n`);
     system.fleet.stop();
     runtime.stop();
     server.close(() => {

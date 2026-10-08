@@ -23,7 +23,7 @@ import { Ledger } from "../server/ledger.ts";
 const NOW = 1_700_000_000_000;
 
 async function ledgerFile(): Promise<string> {
-  const dir = await mkdtemp(path.join(os.tmpdir(), "zeus-ledger-"));
+  const dir = await mkdtemp(path.join(os.tmpdir(), "ares-ledger-"));
   return path.join(dir, "ledger.db");
 }
 
@@ -110,7 +110,7 @@ test("the ledger table is append-only at the engine level", async () => {
 });
 
 test("a restarted arbiter resumes the chain from its own store and warns on a tamper", async () => {
-  const dir = await mkdtemp(path.join(os.tmpdir(), "zeus-boot-"));
+  const dir = await mkdtemp(path.join(os.tmpdir(), "ares-boot-"));
   const file = path.join(dir, "boot.db");
 
   const first = bootstrap({ dbFile: file, uploadDir: path.join(dir, "up-1"), env: {}, now: () => NOW });

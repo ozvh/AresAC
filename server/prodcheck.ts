@@ -44,14 +44,14 @@ function flag(env: NodeJS.ProcessEnv, name: string): boolean {
 }
 
 /**
- * Production is claimed by either variable. `NODE_ENV` is the convention; `ZEUS_ENV`
+ * Production is claimed by either variable. `NODE_ENV` is the convention; `ARES_ENV`
  * exists because a platform that rewrites `NODE_ENV` should not be able to silently
  * demote a deployment to development and switch these checks off.
  */
 export function isProduction(env: NodeJS.ProcessEnv): boolean {
   const node = (env["NODE_ENV"] ?? "").trim().toLowerCase();
-  const zeus = (env["ZEUS_ENV"] ?? "").trim().toLowerCase();
-  return node === "production" || zeus === "production";
+  const ares = (env["ARES_ENV"] ?? "").trim().toLowerCase();
+  return node === "production" || ares === "production";
 }
 
 /** The shape `bootstrap` requires of a hex secret, restated where readiness can see it. */
@@ -87,15 +87,15 @@ function plaintextRemoteOrigin(origin: string): boolean {
  */
 function secretFindings(env: NodeJS.ProcessEnv): string[] {
   const findings: string[] = [];
-  if (!hex64(env["ZEUS_SESSION_KEY"])) {
-    findings.push("ZEUS_SESSION_KEY is unset or is not 64 hex characters: sessions would be invalidated by the next restart");
+  if (!hex64(env["ARES_SESSION_KEY"])) {
+    findings.push("ARES_SESSION_KEY is unset or is not 64 hex characters: sessions would be invalidated by the next restart");
   }
-  if (!hex64(env["ZEUS_MASTER_KEY"])) {
-    findings.push("ZEUS_MASTER_KEY is unset or is not 64 hex characters: the enrolled agent fleet would change identity on the next restart");
+  if (!hex64(env["ARES_MASTER_KEY"])) {
+    findings.push("ARES_MASTER_KEY is unset or is not 64 hex characters: the enrolled agent fleet would change identity on the next restart");
   }
-  const token = env["ZEUS_OPERATOR_TOKEN"];
+  const token = env["ARES_OPERATOR_TOKEN"];
   if (typeof token !== "string" || token.trim().length < 32) {
-    findings.push("ZEUS_OPERATOR_TOKEN is unset or shorter than 32 characters: the control-plane token would be regenerated on every boot and printed for an operator to copy");
+    findings.push("ARES_OPERATOR_TOKEN is unset or shorter than 32 characters: the control-plane token would be regenerated on every boot and printed for an operator to copy");
   }
   return findings;
 }
@@ -106,36 +106,36 @@ export function productionReadiness(input: ReadinessInput): Readiness {
   const fatal: string[] = [];
   const warnings: string[] = [];
 
-  const bootstrapPassword = (env["ZEUS_BOOTSTRAP_ADMIN_PASSWORD"] ?? "").trim();
+  const bootstrapPassword = (env["ARES_BOOTSTRAP_ADMIN_PASSWORD"] ?? "").trim();
 
   if (production) {
     if (!cookieSecure) {
-      fatal.push("ZEUS_COOKIE_SECURE is not 1 while NODE_ENV is production: the session cookie would cross the network without the Secure flag");
+      fatal.push("ARES_COOKIE_SECURE is not 1 while NODE_ENV is production: the session cookie would cross the network without the Secure flag");
     }
     fatal.push(...secretFindings(env));
     for (const origin of origins) {
       if (plaintextRemoteOrigin(origin)) {
-        fatal.push(`ZEUS_CONSOLE_ORIGINS admits ${origin}: an origin that is not loopback and not https may call this API with credentials sent in clear text`);
+        fatal.push(`ARES_CONSOLE_ORIGINS admits ${origin}: an origin that is not loopback and not https may call this API with credentials sent in clear text`);
       }
     }
     if (bootstrapPassword !== "" && bootstrapPassword.length < PASSWORD_MIN) {
-      fatal.push(`ZEUS_BOOTSTRAP_ADMIN_PASSWORD is shorter than ${PASSWORD_MIN} characters`);
+      fatal.push(`ARES_BOOTSTRAP_ADMIN_PASSWORD is shorter than ${PASSWORD_MIN} characters`);
     }
     if (bootstrapPassword === "") {
-      warnings.push("ZEUS_BOOTSTRAP_ADMIN_PASSWORD is unset: no administrator account can be created, so the review console has no authorised reader");
+      warnings.push("ARES_BOOTSTRAP_ADMIN_PASSWORD is unset: no administrator account can be created, so the review console has no authorised reader");
     }
     if (!tls) {
-      warnings.push("no TLS material is configured on this listener: terminate TLS at a reverse proxy, or set ZEUS_TLS_CERT and ZEUS_TLS_KEY");
+      warnings.push("no TLS material is configured on this listener: terminate TLS at a reverse proxy, or set ARES_TLS_CERT and ARES_TLS_KEY");
     }
-    if (!flag(env, "ZEUS_TRUST_PROXY")) {
-      warnings.push("ZEUS_TRUST_PROXY is not 1: behind a reverse proxy every client keys to the same rate-limit bucket and the audit trail records the proxy as the source");
+    if (!flag(env, "ARES_TRUST_PROXY")) {
+      warnings.push("ARES_TRUST_PROXY is not 1: behind a reverse proxy every client keys to the same rate-limit bucket and the audit trail records the proxy as the source");
     }
     if (!tls && origins.every((origin) => origin.startsWith("http://"))) {
       warnings.push("every permitted origin is plaintext http: credentials would only be protected by the transport being loopback");
     }
   } else {
     warnings.push(
-      "environment is not production: the refusing checks are advisory. Set NODE_ENV=production (or ZEUS_ENV=production) to have an insecure configuration stop the process.",
+      "environment is not production: the refusing checks are advisory. Set NODE_ENV=production (or ARES_ENV=production) to have an insecure configuration stop the process.",
     );
     if (!tls) {
       warnings.push("no TLS material is configured; this is expected on loopback and unsafe anywhere else");
@@ -147,3 +147,4 @@ export function productionReadiness(input: ReadinessInput): Readiness {
 
 /** Re-exported so a caller can size a bootstrap credential without importing the hasher. */
 export const BOOTSTRAP_PASSWORD_MIN = PASSWORD_MIN;
+import "./legacy-env.ts";

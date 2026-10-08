@@ -44,7 +44,7 @@ export type AccountRequest = {
 
 /** Signup and login ceilings per source. Far below the ingest budget, for a different reason. */
 /**
- * The global signup gate, adjustable with `ZEUS_SIGNUP_PER_MIN`.
+ * The global signup gate, adjustable with `ARES_SIGNUP_PER_MIN`.
  *
  * Every other limit in this system is charged against one account or one source, so the
  * only client that can trip it is the one it was written for. This one is charged against
@@ -54,7 +54,7 @@ export type AccountRequest = {
  * that is the control that stops one caller from enumerating accounts.
  */
 function signupCeiling(): { readonly perMin: number; readonly burst: number } {
-  const raw = Number((process.env["ZEUS_SIGNUP_PER_MIN"] ?? "").trim());
+  const raw = Number((process.env["ARES_SIGNUP_PER_MIN"] ?? "").trim());
   if (!Number.isFinite(raw) || raw < 1) return { perMin: SIGNUP_PER_MIN, burst: SIGNUP_BURST };
   const perMin = Math.min(100_000, Math.floor(raw));
   return { perMin, burst: Math.max(SIGNUP_BURST, Math.ceil(perMin / 2)) };
@@ -124,7 +124,7 @@ function authorise(
 
   // The token is derived from the cookie, so the guard needs both: the session names the
   // expected value, and the cookie is what it is derived from.
-  if (options.mutation && !runtime.auth.verifyCsrf(identity, rawCookie, header(req, "x-zeus-csrf"))) {
+  if (options.mutation && !runtime.auth.verifyCsrf(identity, rawCookie, header(req, "x-ares-csrf"))) {
     fail(res, 403, "FORBIDDEN", "the request did not carry this session's token");
     return null;
   }

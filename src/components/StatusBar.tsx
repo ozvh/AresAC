@@ -56,7 +56,7 @@ export default function StatusBar(): JSX.Element {
     <header className="flex h-[30px] shrink-0 items-center justify-between gap-4 overflow-hidden border-b border-line bg-panel px-2 text-[10px] uppercase tracking-[0.18em]">
       {/* Principal and binding */}
       <span className="flex shrink-0 items-center gap-3">
-        <span className="text-fg">ZEUS // ARBITER CONSOLE</span>
+        <span className="text-fg">ARES // ARBITER CONSOLE</span>
         <span className={LINK_TEXT[state.link]}>[{state.link}]</span>
         {state.reason === "" ? null : <span className="text-dimmer">· {state.reason}</span>}
         {/* The only navigation out of the console, and the only way the public

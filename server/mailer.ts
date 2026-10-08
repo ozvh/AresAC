@@ -58,11 +58,11 @@ export type MailerConfig = {
 export const DEFAULT_RECIPIENT = "cagelove094@gmail.com";
 
 /** Provider default sender. A verified domain is required to send from anything else. */
-const DEFAULT_FROM = "ZEUS Arbiter <onboarding@resend.dev>";
+const DEFAULT_FROM = "ARES Arbiter <onboarding@resend.dev>";
 
 const DEFAULT_ENDPOINT = "https://api.resend.com/emails";
 
-const DEFAULT_SPOOL = ".zeus-requests.log";
+const DEFAULT_SPOOL = ".ares-requests.log";
 
 /** Hard ceilings on the transmitted message, independent of the intake bounds. */
 const SUBJECT_MAX = 180;
@@ -152,10 +152,10 @@ export class Mailer {
   static fromEnv(env: NodeJS.ProcessEnv): Mailer {
     return new Mailer({
       apiKey: (env["RESEND_API_KEY"] ?? "").trim(),
-      from: (env["ZEUS_REQUEST_FROM"] ?? DEFAULT_FROM).trim(),
-      recipient: (env["ZEUS_REQUEST_TO"] ?? DEFAULT_RECIPIENT).trim(),
-      endpoint: (env["ZEUS_REQUEST_ENDPOINT"] ?? DEFAULT_ENDPOINT).trim(),
-      spoolPath: path.resolve(process.cwd(), env["ZEUS_REQUEST_SPOOL"] ?? DEFAULT_SPOOL),
+      from: (env["ARES_REQUEST_FROM"] ?? DEFAULT_FROM).trim(),
+      recipient: (env["ARES_REQUEST_TO"] ?? DEFAULT_RECIPIENT).trim(),
+      endpoint: (env["ARES_REQUEST_ENDPOINT"] ?? DEFAULT_ENDPOINT).trim(),
+      spoolPath: path.resolve(process.cwd(), env["ARES_REQUEST_SPOOL"] ?? DEFAULT_SPOOL),
       timeoutMs: 8_000,
     });
   }

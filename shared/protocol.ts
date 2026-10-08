@@ -1,5 +1,5 @@
 /**
- * ZEUS wire protocol. Single source of truth for the arbiter and the operator console.
+ * ARES wire protocol. Single source of truth for the arbiter and the operator console.
  *
  * DESIGN CONSTRAINTS (why this file looks the way it does):
  *  1. Field names are compressed. The console is an untrusted display surface; nothing

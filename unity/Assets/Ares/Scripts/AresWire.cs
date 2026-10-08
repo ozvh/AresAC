@@ -1,4 +1,4 @@
-// ZEUS wire protocol core — Unity demo client.
+// ARES wire protocol core — Unity demo client.
 //
 // DEMO ONLY. This file is a transcription of the recipe the arbiter itself uses:
 //
@@ -28,10 +28,10 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Zeus.Demo
+namespace Ares.Demo
 {
     /// <summary>Ring as it travels on the wire. Matches ROLE_RING in shared/protocol.ts.</summary>
-    public enum ZeusRing
+    public enum AresRing
     {
         Kmod = 0,
         Umon = 3,
@@ -39,7 +39,7 @@ namespace Zeus.Demo
     }
 
     /// <summary>One telemetry sample. Field names are the wire names, one to two characters.</summary>
-    public struct ZeusEvent
+    public struct AresEvent
     {
         public int v;
         public string a;
@@ -51,13 +51,13 @@ namespace Zeus.Demo
         public long m;
     }
 
-    public static class ZeusWire
+    public static class AresWire
     {
         public const int ProtocolVersion = 1;
         public const int BatchMax = 64;
 
         /// <summary>Public by design. Not a credential, and never usable outside the demo.</summary>
-        public const string DemoPassphrase = "zeus-unity-demo/loopback-only-not-a-production-secret";
+        public const string DemoPassphrase = "ares-unity-demo/loopback-only-not-a-production-secret";
 
         public static byte[] Sha256(string text)
         {
@@ -114,11 +114,11 @@ namespace Zeus.Demo
         /// </summary>
         public static string Subject(string name)
         {
-            return Hex(Sha256("zeus-unity-demo-subject:" + name)).Substring(0, 32);
+            return Hex(Sha256("ares-unity-demo-subject:" + name)).Substring(0, 32);
         }
 
         /// <summary>The exact string the arbiter verifies. Field order is fixed: v|a|s|t|r|c|m|k.</summary>
-        public static string Canonical(ZeusEvent e)
+        public static string Canonical(AresEvent e)
         {
             return string.Concat(
                 Int(e.v), "|",
@@ -132,7 +132,7 @@ namespace Zeus.Demo
         }
 
         /// <summary>Batch canonical form: one event's canonical string per line, in order.</summary>
-        public static string CanonicalBatch(List<ZeusEvent> events)
+        public static string CanonicalBatch(List<AresEvent> events)
         {
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < events.Count; i++)
@@ -143,14 +143,14 @@ namespace Zeus.Demo
             return builder.ToString();
         }
 
-        /// <summary>The MAC carried in the x-zeus-sig header.</summary>
+        /// <summary>The MAC carried in the x-ares-sig header.</summary>
         public static string Sign(byte[] key, string canonicalBatch)
         {
             return Hex(HmacSha256(key, canonicalBatch));
         }
 
         /// <summary>One event as JSON. The arbiter parses by key, so field order is free here.</summary>
-        public static string Json(ZeusEvent e)
+        public static string Json(AresEvent e)
         {
             StringBuilder builder = new StringBuilder(96);
             builder.Append('{');
@@ -167,7 +167,7 @@ namespace Zeus.Demo
         }
 
         /// <summary>The request body: a JSON array of one agent's events.</summary>
-        public static string Body(List<ZeusEvent> events)
+        public static string Body(List<AresEvent> events)
         {
             StringBuilder builder = new StringBuilder(128);
             builder.Append('[');
@@ -201,31 +201,31 @@ namespace Zeus.Demo
     /// arbiter refuses a repeat as a replay, and advancing it is the client's only ordering
     /// obligation — the arbiter's own clock is the ordering authority, never `t`.
     /// </summary>
-    public sealed class ZeusAgent
+    public sealed class AresAgent
     {
         public readonly string Role;
         public readonly int Counter;
-        public readonly ZeusRing Ring;
+        public readonly AresRing Ring;
         public readonly string Id;
         public readonly byte[] Key;
 
         private uint _seq;
 
-        public ZeusAgent(string role, int counter, ZeusRing ring)
+        public AresAgent(string role, int counter, AresRing ring)
         {
             Role = role;
             Counter = counter;
             Ring = ring;
-            Id = ZeusWire.AgentId(role, counter);
-            Key = ZeusWire.AgentKey(Id);
+            Id = AresWire.AgentId(role, counter);
+            Key = AresWire.AgentKey(Id);
         }
 
         /// <summary>Next sample for this ring, with its sequence number assigned.</summary>
-        public ZeusEvent Next(string subject, string code, long measurement, long nowMs)
+        public AresEvent Next(string subject, string code, long measurement, long nowMs)
         {
             _seq += 1;
-            ZeusEvent e = new ZeusEvent();
-            e.v = ZeusWire.ProtocolVersion;
+            AresEvent e = new AresEvent();
+            e.v = AresWire.ProtocolVersion;
             e.a = Id;
             e.k = subject;
             e.s = _seq;

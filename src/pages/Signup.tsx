@@ -159,7 +159,7 @@ export default function Signup(): JSX.Element {
     <div className="flex min-h-screen flex-col bg-void text-fg">
       <header className="flex h-[30px] shrink-0 items-center justify-between gap-4 border-b border-line bg-panel px-2 text-[10px] uppercase tracking-[0.18em]">
         <span className="flex items-center gap-3">
-          <span className="text-fg">ZEUS // CREATE ACCOUNT</span>
+          <span className="text-fg">ARES // CREATE ACCOUNT</span>
           <span className="text-dimmer">CUSTOMER · HASHED · SERVER-SIDE SESSION</span>
         </span>
         <span className="flex shrink-0 items-baseline gap-3">

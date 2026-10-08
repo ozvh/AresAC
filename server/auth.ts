@@ -39,10 +39,10 @@ import { SESSION_TTL_MS, SESSION_TOUCH_MS, Store, type Role, type UserRow } from
 import { checkPassword, hashPassword, unusableDigest, verifyAbsent, verifyPassword } from "./passwords.ts";
 
 /** Cookie name. Not `__Host-`-prefixed: that prefix demands `Secure`, which local HTTP cannot set. */
-export const SESSION_COOKIE = "zeus_session";
+export const SESSION_COOKIE = "ares_session";
 
 /** CSRF header. A header, not a form field, so it cannot be produced by a plain form post. */
-export const CSRF_HEADER = "x-zeus-csrf";
+export const CSRF_HEADER = "x-ares-csrf";
 
 /** Failed authentications before an account is briefly locked. */
 const MAX_FAILURES = 8;
@@ -605,11 +605,11 @@ export class Auth {
    */
   async ensureBootstrapAdmin(env: NodeJS.ProcessEnv): Promise<string> {
     if (this.#store.countUsers("ADMIN") > 0) return "existing administrator present";
-    const email = normalizeEmail(env["ZEUS_BOOTSTRAP_ADMIN_EMAIL"] ?? "");
-    const password = env["ZEUS_BOOTSTRAP_ADMIN_PASSWORD"] ?? "";
+    const email = normalizeEmail(env["ARES_BOOTSTRAP_ADMIN_EMAIL"] ?? "");
+    const password = env["ARES_BOOTSTRAP_ADMIN_PASSWORD"] ?? "";
     const now = this.#now();
     if (email === "" || password === "") {
-      return "no administrator yet; set ZEUS_BOOTSTRAP_ADMIN_EMAIL and ZEUS_BOOTSTRAP_ADMIN_PASSWORD once";
+      return "no administrator yet; set ARES_BOOTSTRAP_ADMIN_EMAIL and ARES_BOOTSTRAP_ADMIN_PASSWORD once";
     }
     if (!EMAIL_SHAPE.test(email) || checkPassword(password, email) !== null) {
       return "bootstrap administrator rejected: address or password does not meet policy";

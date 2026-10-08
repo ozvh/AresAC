@@ -1,7 +1,7 @@
 /**
  * The closing call to action, and the site's actual footer.
  *
- * Two halves: a centred "bring the thunder down" block that repeats the hero's promise and
+ * Two halves: a centred "bring the line down" block that repeats the hero's promise and
  * offers the two ways forward, and then a conventional four-column grid with the wordmark
  * set once more at 26vw — the largest type on the page, cut off at the baseline by its own
  * negative margin, so the page ends on the brand rather than on a legal line.
@@ -81,23 +81,23 @@ export default function Footer(): JSX.Element {
   return (
     <footer className="relative overflow-hidden border-t border-line">
       <section id="deploy" className="relative mx-auto max-w-[1440px] px-6 py-32 text-center md:px-10 md:py-44">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_45%_at_50%_55%,rgba(87,224,255,0.08),transparent_70%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_45%_at_50%_55%,rgba(239,121,94,0.08),transparent_70%)]" />
 
         <Reveal>
           <span className="inline-grid h-16 w-16 place-items-center border border-volt/40 bg-volt/10 text-volt glow-volt clip-notch">
-            <Ic name="zap" strokeWidth={1.8} className="h-7 w-7" />
+            <Ic name="shield-half" strokeWidth={1.8} className="h-7 w-7" />
           </span>
         </Reveal>
 
         <Reveal>
           <h2 className="mx-auto mt-10 max-w-4xl font-display text-5xl font-bold leading-[0.95] tracking-tight text-white md:text-8xl">
-            Bring the <span className="text-hollow-volt">thunder</span> down.
+            Hold the <span className="text-hollow-volt">line.</span>
           </h2>
         </Reveal>
 
         <Reveal>
           <p className="mx-auto mt-8 max-w-xl text-lg leading-relaxed text-mist">
-            Ship a game where skill is the only exploit left. ZEUS integrates in days — and its driver comes with the
+            Ship a game where skill is the only exploit left. ARES integrates in days — and its driver comes with the
             discipline a BSOD-free fleet demands.
           </p>
         </Reveal>
@@ -105,7 +105,7 @@ export default function Footer(): JSX.Element {
         <Reveal className="mt-12 flex flex-wrap items-center justify-center gap-4">
           <a
             href="/request"
-            className="group flex items-center gap-3 bg-volt px-8 py-4 font-mono text-xs font-semibold uppercase tracking-[0.24em] text-abyss transition-all duration-300 hover:shadow-[0_0_50px_rgba(87,224,255,0.5)] clip-notch"
+            className="group flex items-center gap-3 bg-volt px-8 py-4 font-mono text-xs font-semibold uppercase tracking-[0.24em] text-abyss transition-all duration-300 hover:shadow-[0_0_50px_rgba(239,121,94,0.5)] clip-notch"
           >
             Request the build
             <Ic name="arrow-up-right" className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -135,9 +135,9 @@ export default function Footer(): JSX.Element {
             <div>
               <div className="flex items-center gap-3">
                 <span className="grid h-9 w-9 place-items-center border border-line-2 bg-panel clip-notch">
-                  <Ic name="zap" strokeWidth={2.4} className="h-4 w-4 text-volt" />
+                  <Ic name="shield-half" strokeWidth={2.4} className="h-4 w-4 text-volt" />
                 </span>
-                <span className="font-display text-lg font-bold tracking-[0.22em]">ZEUS</span>
+                <span className="font-display text-lg font-bold tracking-[0.22em]">ARES</span>
               </div>
               <p className="mt-5 max-w-xs text-sm leading-relaxed text-mist">
                 Multi-layer anti-cheat architecture. User-mode sentinel, kernel driver, external arbiter — one
@@ -151,17 +151,17 @@ export default function Footer(): JSX.Element {
 
           <div className="pointer-events-none select-none overflow-hidden">
             <div className="text-hollow -mb-[0.23em] text-center font-display text-[26vw] font-bold leading-none tracking-[-0.02em] opacity-40 md:text-[19rem]">
-              ZEUS
+              ARES
             </div>
           </div>
         </div>
 
         <div className="border-t border-line bg-abyss/70 backdrop-blur">
           <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-4 px-6 py-5 font-mono text-[10px] tracking-[0.2em] text-mist md:px-10">
-            <span>© 2026 ZEUS INDUSTRIES — KERNEL DIVISION</span>
+            <span>© 2026 ARES ANTI CHEAT</span>
             <span className="text-volt">BLOCK ≠ BAN.</span>
             <a href="#top" className="flex items-center gap-2 transition-colors hover:text-white">
-              BACK TO ORBIT <Ic name="arrow-up" className="h-3.5 w-3.5" />
+              BACK TO TOP <Ic name="arrow-up" className="h-3.5 w-3.5" />
             </a>
           </div>
         </div>

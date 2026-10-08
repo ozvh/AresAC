@@ -46,7 +46,7 @@ export type DemoAgentSpec = {
 /**
  * The three demo agents, derived from the recipe alone.
  *
- * This is the same computation `unity/Assets/Zeus/Scripts/ZeusWire.cs` performs, and the same
+ * This is the same computation `unity/Assets/Ares/Scripts/AresWire.cs` performs, and the same
  * one `server/agents.ts` performs when the demo arbiter enrols them — three implementations of
  * one recipe, which `tests/unity-demo.test.ts` pins against each other.
  */
@@ -80,7 +80,7 @@ export type DemoPost = {
 
 /**
  * Sign and post one batch, exactly as the Unity client does: canonical string, HMAC over it,
- * `x-zeus-sig` header, JSON array body.
+ * `x-ares-sig` header, JSON array body.
  *
  * The batch carries one principal's events, because the arbiter refuses a batch spanning two
  * agents — a single MAC cannot honestly cover two keys.
@@ -106,7 +106,7 @@ export async function postDemoEvent(
   const sig = createHmac("sha256", key).update(canonical, "utf8").digest("hex");
   const response = await fetch(`${baseUrl}/v1/ingest`, {
     method: "POST",
-    headers: { "content-type": "application/json", "x-zeus-sig": sig },
+    headers: { "content-type": "application/json", "x-ares-sig": sig },
     body: JSON.stringify([event]),
   });
   return { status: response.status, body: await response.text() };
@@ -165,18 +165,18 @@ async function main(): Promise<void> {
   const portArg = argv.find((argument) => argument.startsWith("--port="));
   const port = portArg === undefined ? DEFAULT_PORT : Number(portArg.slice("--port=".length));
 
-  const provided = process.env["ZEUS_MASTER_KEY"];
+  const provided = process.env["ARES_MASTER_KEY"];
   // The demo pins the master, because the ids the Unity client derives depend on it. An
   // operator who already had a key set is told it is being overridden rather than left to
   // wonder why their fleet changed identity.
   const env: NodeJS.ProcessEnv = {
     ...process.env,
-    ZEUS_MASTER_KEY: demoMaster().toString("hex"),
-    ZEUS_DB: ".zeus-data/unity-demo.db",
-    ZEUS_UPLOAD_DIR: ".zeus-data/unity-demo-uploads",
-    ZEUS_SESSIONS: "0",
-    ZEUS_TPS: "0",
-    ZEUS_COOKIE_SECURE: "0",
+    ARES_MASTER_KEY: demoMaster().toString("hex"),
+    ARES_DB: ".ares-data/unity-demo.db",
+    ARES_UPLOAD_DIR: ".ares-data/unity-demo-uploads",
+    ARES_SESSIONS: "0",
+    ARES_TPS: "0",
+    ARES_COOKIE_SECURE: "0",
     NODE_ENV: "development",
   };
 
@@ -192,7 +192,7 @@ async function main(): Promise<void> {
     const role = DEMO_ROLES[index] ?? "UMON";
     if (spec === undefined || agent.id !== spec.id || !agent.key.equals(spec.key)) {
       process.stderr.write(
-        `\n ZEUS demo refused to start: the enrolled ${role} agent does not match the published recipe.\n` +
+        `\n ARES demo refused to start: the enrolled ${role} agent does not match the published recipe.\n` +
           " The Unity client derives its id and key from tools/demo-agents.ts; a mismatch makes every batch unauthenticated.\n\n",
       );
       system.store.close();
@@ -220,7 +220,7 @@ async function main(): Promise<void> {
   process.stdout.write(
     [
       line,
-      " ZEUS Unity demo — the real arbiter, three demo agents, no synthetic fleet",
+      " ARES Unity demo — the real arbiter, three demo agents, no synthetic fleet",
       line,
       ` arbiter       http://127.0.0.1:${port}/v1/ingest`,
       ` console       ${staticDir === null ? `(none — run "npm run build" for the operator console)` : `http://127.0.0.1:${port}/console`}`,
@@ -234,7 +234,7 @@ async function main(): Promise<void> {
       `               key = HMAC(master, "agent-key:<id>")`,
       `               sig = HMAC(key, events.map(canonical).join("\\n"))`,
       "",
-      " Unity:        drop unity/Assets/Zeus into the project and set Base Url above.",
+      " Unity:        drop unity/Assets/Ares into the project and set Base Url above.",
       ...(serverOnly ? [" (--server-only: the stand-in client is disabled)"] : []),
       line,
       ...system.notices.map((notice) => ` [!] ${notice}`),
@@ -242,8 +242,8 @@ async function main(): Promise<void> {
     ].join("\n"),
   );
 
-  if (provided !== undefined && provided !== env["ZEUS_MASTER_KEY"]) {
-    process.stdout.write(" [!] ZEUS_MASTER_KEY was set in the environment and has been replaced by the demo recipe key\n\n");
+  if (provided !== undefined && provided !== env["ARES_MASTER_KEY"]) {
+    process.stdout.write(" [!] ARES_MASTER_KEY was set in the environment and has been replaced by the demo recipe key\n\n");
   }
 
   if (!serverOnly) {

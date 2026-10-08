@@ -16,9 +16,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Zeus.Demo
+namespace Ares.Demo
 {
-    public sealed class ZeusDemoAgent : MonoBehaviour
+    public sealed class AresDemoAgent : MonoBehaviour
     {
         [Header("Arbiter")]
         [Tooltip("The demo arbiter. tools/unity-demo.ts listens on this port by default.")]
@@ -35,7 +35,7 @@ namespace Zeus.Demo
         [Tooltip("Play the timeline on Start.")]
         public bool autoRun = true;
 
-        private readonly List<ZeusAgent> _agents = new List<ZeusAgent>();
+        private readonly List<AresAgent> _agents = new List<AresAgent>();
         private string _subject;
         private bool _running;
 
@@ -64,13 +64,13 @@ namespace Zeus.Demo
 
         private void Awake()
         {
-            _subject = ZeusWire.Subject(subjectName);
+            _subject = AresWire.Subject(subjectName);
             // Counters are fixed by the demo arbiter's enrolment order (tools/unity-demo.ts:
             // an empty registry, then KMOD, UMON, SRV), which is what lets the client derive
             // the same identities the arbiter minted without any credential being transferred.
-            _agents.Add(new ZeusAgent("KMOD", 1, ZeusRing.Kmod));
-            _agents.Add(new ZeusAgent("UMON", 2, ZeusRing.Umon));
-            _agents.Add(new ZeusAgent("SRV", 3, ZeusRing.Srv));
+            _agents.Add(new AresAgent("KMOD", 1, AresRing.Kmod));
+            _agents.Add(new AresAgent("UMON", 2, AresRing.Umon));
+            _agents.Add(new AresAgent("SRV", 3, AresRing.Srv));
         }
 
         private void Start()
@@ -82,12 +82,12 @@ namespace Zeus.Demo
         {
             if (_running) yield break;
             _running = true;
-            Debug.Log("[zeus] subject digest " + _subject + " (a digest, never an account id)");
+            Debug.Log("[ares] subject digest " + _subject + " (a digest, never an account id)");
             foreach (Phase phase in Timeline)
             {
-                ZeusAgent agent = Find(phase.Role);
+                AresAgent agent = Find(phase.Role);
                 if (agent == null) continue;
-                Debug.Log("[zeus] phase " + phase.Label + " as " + phase.Role + " code " + phase.Code);
+                Debug.Log("[ares] phase " + phase.Label + " as " + phase.Role + " code " + phase.Code);
                 float interval = Mathf.Max(0.05f, 1f / perSecond);
                 for (float elapsed = 0f; elapsed < phase.Seconds; elapsed += interval)
                 {
@@ -96,7 +96,7 @@ namespace Zeus.Demo
                     yield return new WaitForSeconds(interval);
                 }
             }
-            Debug.Log("[zeus] timeline complete — the console should read FLAGGED for this subject");
+            Debug.Log("[ares] timeline complete — the console should read FLAGGED for this subject");
             _running = false;
         }
 
@@ -109,11 +109,11 @@ namespace Zeus.Demo
         /// </summary>
         public void SendForgedRingClaim()
         {
-            ZeusAgent kmod = Find("KMOD");
+            AresAgent kmod = Find("KMOD");
             if (kmod == null) return;
-            ZeusEvent forged = kmod.Next(_subject, "X2", 1L, NowMs());
-            forged.r = (int)ZeusRing.Umon; // the lie under test
-            List<ZeusEvent> batch = new List<ZeusEvent>();
+            AresEvent forged = kmod.Next(_subject, "X2", 1L, NowMs());
+            forged.r = (int)AresRing.Umon; // the lie under test
+            List<AresEvent> batch = new List<AresEvent>();
             batch.Add(forged);
             StartCoroutine(SendBatch(kmod, batch));
         }
@@ -124,35 +124,35 @@ namespace Zeus.Demo
             get { return _subject; }
         }
 
-        private IEnumerator SendOne(ZeusAgent agent, string code, long measurement)
+        private IEnumerator SendOne(AresAgent agent, string code, long measurement)
         {
-            List<ZeusEvent> batch = new List<ZeusEvent>();
+            List<AresEvent> batch = new List<AresEvent>();
             batch.Add(agent.Next(_subject, code, measurement, NowMs()));
             yield return StartCoroutine(SendBatch(agent, batch));
         }
 
-        private IEnumerator SendBatch(ZeusAgent agent, List<ZeusEvent> batch)
+        private IEnumerator SendBatch(AresAgent agent, List<AresEvent> batch)
         {
-            ZeusIngestClient client = new ZeusIngestClient(baseUrl, agent);
-            yield return StartCoroutine(client.Send(batch, delegate (ZeusIngestResult result)
+            AresIngestClient client = new AresIngestClient(baseUrl, agent);
+            yield return StartCoroutine(client.Send(batch, delegate (AresIngestResult result)
             {
                 string code = batch[0].c;
                 if (result.Ok)
                 {
-                    Debug.Log("[zeus] " + agent.Role + " " + code + " accepted (202)");
+                    Debug.Log("[ares] " + agent.Role + " " + code + " accepted (202)");
                 }
                 else if (result.Unauthenticated)
                 {
-                    Debug.LogError("[zeus] " + agent.Role + " " + code + " refused 401 — the agent id or key does not match the arbiter's enrolment. Is the demo arbiter the one on port " + baseUrl + "?");
+                    Debug.LogError("[ares] " + agent.Role + " " + code + " refused 401 — the agent id or key does not match the arbiter's enrolment. Is the demo arbiter the one on port " + baseUrl + "?");
                 }
                 else
                 {
-                    Debug.LogWarning("[zeus] " + agent.Role + " " + code + " refused " + result.Status + " " + (result.Error ?? result.Body));
+                    Debug.LogWarning("[ares] " + agent.Role + " " + code + " refused " + result.Status + " " + (result.Error ?? result.Body));
                 }
             }));
         }
 
-        private ZeusAgent Find(string role)
+        private AresAgent Find(string role)
         {
             for (int i = 0; i < _agents.Count; i++)
             {

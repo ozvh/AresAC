@@ -148,7 +148,7 @@ export default function Account(): JSX.Element {
       <div className="flex min-h-screen flex-col bg-void text-fg">
         <header className="flex h-[30px] shrink-0 items-center justify-between gap-4 border-b border-line bg-panel px-2 text-[10px] uppercase tracking-[0.18em]">
           <span className="flex items-center gap-3">
-            <span className="text-fg">ZEUS // ACCOUNT</span>
+            <span className="text-fg">ARES // ACCOUNT</span>
             <span className="text-flagged">NO SESSION</span>
           </span>
           <a href="/" className="text-dim hover:text-fg">
@@ -190,7 +190,7 @@ export default function Account(): JSX.Element {
     <div className="flex min-h-screen flex-col bg-void text-fg">
       <header className="flex h-[30px] shrink-0 items-center justify-between gap-4 border-b border-line bg-panel px-2 text-[10px] uppercase tracking-[0.18em]">
         <span className="flex items-center gap-3">
-          <span className="text-fg">ZEUS // ACCOUNT</span>
+          <span className="text-fg">ARES // ACCOUNT</span>
           <span className={phase === "READY" ? "text-fg" : "text-dimmer"}>
             {phase === "READY" && user !== null ? user.email : "LOADING"}
           </span>

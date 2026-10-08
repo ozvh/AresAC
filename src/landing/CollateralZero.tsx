@@ -1,10 +1,10 @@
 /**
  * Section 04 — collateral damage zero.
  *
- * The counterweight to the rest of the page. Sections 01–03 argue that ZEUS can see
+ * The counterweight to the rest of the page. Sections 01–03 argue that ARES can see
  * everything; this one argues that seeing everything is the easy part, and that the failure
  * mode of an anti-cheat is not a missed cheat but a wrongly executed player. Each case card
- * therefore sets a struck-through NAIVE response against the ZEUS one, side by side, so the
+ * therefore sets a struck-through NAIVE response against the ARES one, side by side, so the
  * comparison is the visual unit rather than a claim in prose.
  *
  * Three blocks, in decreasing order of concrete: the cases, the doctrine behind them, and the
@@ -21,7 +21,7 @@ import { Ic } from "./icons";
 import type { IconName } from "./icons";
 import { Reveal } from "./Reveal";
 
-/** One conflict between ZEUS and ordinary software a player is already running. */
+/** One conflict between ARES and ordinary software a player is already running. */
 interface Case {
   readonly icon: IconName;
   readonly kicker: string;
@@ -29,7 +29,7 @@ interface Case {
   readonly body: string;
   /** What a detector without trust chains would do. Always struck through. */
   readonly naive: string;
-  readonly zeus: string;
+  readonly ares: string;
 }
 
 const CASES: readonly Case[] = [
@@ -40,7 +40,7 @@ const CASES: readonly Case[] = [
     body:
       "Frame hooks and overlay injection are byte-identical to a wallhack's draw routine. Any strict user-mode detector screams at them.",
     naive: "code injection detected → flag account",
-    zeus: "Signed + allowlisted: draw hooks permitted, memory-read primitives stay watched.",
+    ares: "Signed + allowlisted: draw hooks permitted, memory-read primitives stay watched.",
   },
   {
     icon: "shield-alert",
@@ -49,7 +49,7 @@ const CASES: readonly Case[] = [
     body:
       "Two guards wrestling — your driver's monitoring of memory reads looks rootkit-like to AV engines, and naive heuristics mirror-detect the AV's own drivers right back.",
     naive: "driver conflict → instability loops, BSOD risk",
-    zeus: "Chain-trust attestation: security vendor certificates bypass heuristic blocks entirely.",
+    ares: "Chain-trust attestation: security vendor certificates bypass heuristic blocks entirely.",
   },
   {
     icon: "mouse",
@@ -58,7 +58,7 @@ const CASES: readonly Case[] = [
     body:
       "Low-level input drivers that synthesize keystrokes and clicks are indistinguishable from macro engines to a detector that only watches APIs.",
     naive: "virtual input → aimbot-macro conviction",
-    zeus: "Input-provenance scoring: vendor chain trusted, timing entropy analyzed — never auto-flagged.",
+    ares: "Input-provenance scoring: vendor chain trusted, timing entropy analyzed — never auto-flagged.",
   },
 ];
 
@@ -184,8 +184,8 @@ export default function CollateralZero(): JSX.Element {
                 <span className="line-through decoration-blood/40">{item.naive}</span>
               </div>
               <div className="flex gap-2.5 text-mint/95">
-                <span className="shrink-0 tracking-[0.14em] text-mint/60">{"ZEUS\u00a0\u00a0"}</span>
-                <span>{item.zeus}</span>
+                <span className="shrink-0 tracking-[0.14em] text-mint/60">{"ARES\u00a0\u00a0"}</span>
+                <span>{item.ares}</span>
               </div>
             </div>
           </Reveal>

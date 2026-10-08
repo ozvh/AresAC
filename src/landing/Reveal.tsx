@@ -42,7 +42,7 @@ export function Reveal({
 }: {
   readonly as?: RevealTag | undefined;
   /**
-   * `rise` fades and lifts. `blur` also focuses from a heavy blur — used on the hero's ZEUS
+   * `rise` fades and lifts. `blur` also focuses from a heavy blur — used on the hero's ARES
    * mark and on the kernel detail panel, the two places the original spent it.
    */
   readonly variant?: "rise" | "blur" | undefined;

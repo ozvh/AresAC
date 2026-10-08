@@ -1,9 +1,9 @@
 {
-  "name": "zeus-arbiter",
+  "name": "ares-anti-cheat",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "ZEUS anti-cheat: server-side arbiter (authoritative) + monochrome operator console (zero-trust observer).",
+  "description": "ARES anti-cheat: server-side arbiter (authoritative) + monochrome operator console (zero-trust observer).",
   "scripts": {
     "dev": "infisical run --env=dev -- vite",
     "arbiter": "infisical run --env=dev -- node --experimental-strip-types --no-warnings server/index.ts",

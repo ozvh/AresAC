@@ -82,7 +82,7 @@ async function post(events: IngestEvent[], agent: Agent, overrides: Record<strin
     method: "POST",
     headers: {
       "content-type": "application/json",
-      "x-zeus-sig": signEvent(agent.key, canonical),
+      "x-ares-sig": signEvent(agent.key, canonical),
       ...overrides,
     },
     body: JSON.stringify(events),
@@ -132,7 +132,7 @@ test("a tampered payload is refused even with a valid signature shape", async ()
   const mutated = events.map((e) => ({ ...e, c: "X3" }));
   const res = await fetch(`${harness.base}/v1/ingest`, {
     method: "POST",
-    headers: { "content-type": "application/json", "x-zeus-sig": mac },
+    headers: { "content-type": "application/json", "x-ares-sig": mac },
     body: JSON.stringify(mutated),
   });
   assert.equal(res.status, 401);
@@ -202,7 +202,7 @@ test("a non-JSON content type is refused without being parsed", async () => {
   const events = makeEvents(monitor, "UMON", "XB");
   const res = await fetch(`${harness.base}/v1/ingest`, {
     method: "POST",
-    headers: { "content-type": "text/plain", "x-zeus-sig": signEvent(monitor.key, events.map(canonicalEvent).join("\n")) },
+    headers: { "content-type": "text/plain", "x-ares-sig": signEvent(monitor.key, events.map(canonicalEvent).join("\n")) },
     body: JSON.stringify(events),
   });
   assert.equal(res.status, 415);
@@ -211,7 +211,7 @@ test("a non-JSON content type is refused without being parsed", async () => {
 test("a declared oversized body is refused before it is read", async () => {
   const res = await fetch(`${harness.base}/v1/ingest`, {
     method: "POST",
-    headers: { "content-type": "application/json", "x-zeus-sig": "0".repeat(64) },
+    headers: { "content-type": "application/json", "x-ares-sig": "0".repeat(64) },
     body: "x".repeat(LIMITS.bodyBytes + 1024),
   });
   assert.equal(res.status, 413);
@@ -233,7 +233,7 @@ test("a streamed body without a declared length still trips the byte ceiling", a
   });
   const res = await fetch(`${harness.base}/v1/ingest`, {
     method: "POST",
-    headers: { "content-type": "application/json", "x-zeus-sig": "0".repeat(64) },
+    headers: { "content-type": "application/json", "x-ares-sig": "0".repeat(64) },
     body: stream,
     // Required by undici for a streaming request body.
     duplex: "half",
@@ -261,14 +261,14 @@ test("control requires the operator token and is throttled", async () => {
 
   const authorised = await fetch(`${harness.base}/v1/control`, {
     method: "POST",
-    headers: { "content-type": "application/json", "x-zeus-op": OPERATOR_TOKEN },
+    headers: { "content-type": "application/json", "x-ares-op": OPERATOR_TOKEN },
     body,
   });
   assert.equal(authorised.status, 200);
 
   const throttled = await fetch(`${harness.base}/v1/control`, {
     method: "POST",
-    headers: { "content-type": "application/json", "x-zeus-op": OPERATOR_TOKEN },
+    headers: { "content-type": "application/json", "x-ares-op": OPERATOR_TOKEN },
     body: JSON.stringify({ op: "RESUME" }),
   });
   assert.equal(throttled.status, 429, "two mutations in one interval must not both land");
@@ -276,7 +276,7 @@ test("control requires the operator token and is throttled", async () => {
   await new Promise((resolve) => setTimeout(resolve, LIMITS.controlMinIntervalMs + 120));
   const resumed = await fetch(`${harness.base}/v1/control`, {
     method: "POST",
-    headers: { "content-type": "application/json", "x-zeus-op": OPERATOR_TOKEN },
+    headers: { "content-type": "application/json", "x-ares-op": OPERATOR_TOKEN },
     body: JSON.stringify({ op: "RESUME" }),
   });
   assert.equal(resumed.status, 200);
@@ -286,7 +286,7 @@ test("an unrecognised control action is refused", async () => {
   await new Promise((resolve) => setTimeout(resolve, LIMITS.controlMinIntervalMs + 120));
   const res = await fetch(`${harness.base}/v1/control`, {
     method: "POST",
-    headers: { "content-type": "application/json", "x-zeus-op": OPERATOR_TOKEN },
+    headers: { "content-type": "application/json", "x-ares-op": OPERATOR_TOKEN },
     body: JSON.stringify({ op: "DROP_ALL_TABLES" }),
   });
   assert.equal(res.status, 400);
@@ -340,7 +340,7 @@ test("a two-ring cheat is convicted, sealed, then released by the operator", asy
   await new Promise((resolve) => setTimeout(resolve, LIMITS.controlMinIntervalMs + 120));
   const released = await fetch(`${harness.base}/v1/control`, {
     method: "POST",
-    headers: { "content-type": "application/json", "x-zeus-op": OPERATOR_TOKEN },
+    headers: { "content-type": "application/json", "x-ares-op": OPERATOR_TOKEN },
     body: JSON.stringify({ op: "RELEASE", su: tag }),
   });
   assert.equal(released.status, 200);

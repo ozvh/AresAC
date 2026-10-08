@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 
 // Arbiter origin. The console is a same-origin observer in production; in dev the
 // Vite server proxies /v1 to the local arbiter process.
-const ARBITER = process.env["ZEUS_ARBITER_ORIGIN"] ?? "http://127.0.0.1:8787";
+const ARBITER = process.env["ARES_ARBITER_ORIGIN"] ?? "http://127.0.0.1:8787";
 
 export default defineConfig({
   // NOTE: single-file inlining is deliberately NOT used.

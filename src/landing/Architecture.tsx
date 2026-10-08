@@ -50,7 +50,7 @@ interface Ring {
   readonly bar: string;
   /** The panel's own badge, e.g. `RING 0`. */
   readonly badge: string;
-  /** One-line file identity under the panel heading, e.g. `zeus.sys · kernel driver`. */
+  /** One-line file identity under the panel heading, e.g. `ares.sys · kernel driver`. */
   readonly file: string;
   /** The accent-coloured line under the panel heading. */
   readonly tagline: string;
@@ -85,9 +85,9 @@ const FOOT_LABEL = "flex items-center gap-2 font-mono text-[10px] tracking-[0.24
 const RINGS: readonly Ring[] = [
   {
     tag: "RING 3",
-    title: "ZEUS Sentinel",
+    title: "ARES Sentinel",
     glyph: "scan-eye",
-    selectedButton: "clip-notch bg-panel border-volt/50 shadow-[inset_0_0_40px_rgba(87,224,255,0.04)]",
+    selectedButton: "clip-notch bg-panel border-volt/50 shadow-[inset_0_0_40px_rgba(239,121,94,0.04)]",
     selectedIcon: "border border-volt/30 bg-volt/10 text-volt",
     selectedLabel: "font-mono text-[10px] tracking-[0.3em] text-volt",
     selectedChevron: "text-volt translate-x-1",
@@ -114,20 +114,20 @@ const RINGS: readonly Ring[] = [
   },
   {
     tag: "RING 0",
-    title: "ZEUS Kernel",
+    title: "ARES Kernel",
     glyph: "circuit-board",
-    selectedButton: "clip-notch bg-panel border-viol/60 shadow-[inset_0_0_40px_rgba(87,224,255,0.04)]",
+    selectedButton: "clip-notch bg-panel border-viol/60 shadow-[inset_0_0_40px_rgba(239,121,94,0.04)]",
     selectedIcon: "border border-viol/40 bg-viol/10 text-viol",
     selectedLabel: "font-mono text-[10px] tracking-[0.3em] text-viol",
     selectedChevron: "text-viol translate-x-1",
     bar: "absolute inset-x-0 top-0 h-[2px] bg-viol",
     badge: "border px-2.5 py-1 font-mono text-[10px] tracking-[0.3em] border-viol/40 bg-viol/10 text-viol",
-    file: "zeus.sys · kernel driver",
+    file: "ares.sys · kernel driver",
     tagline: "The high ground. Nothing hides below it.",
     taglineClass: "mt-2 font-mono text-xs tracking-[0.12em] text-viol",
     watermark: "h-14 w-14 md:h-20 md:w-20 text-viol opacity-80",
     index: "mt-0.5 font-mono text-[10px] text-viol",
-    body: "A signed WDK driver that watches the watchmen. Zeus.sys intercepts handle creation, image loads and process birth system-wide — vetoing abuse before user-mode code ever executes.",
+    body: "A signed WDK driver that watches the watchmen. Ares.sys intercepts handle creation, image loads and process birth system-wide — vetoing abuse before user-mode code ever executes.",
     items: [
       { title: "Handle-creation veto & access stripping", mechanism: "ObRegisterCallbacks" },
       { title: "Process-birth interdiction", mechanism: "PsSetCreateProcessNotifyRoutineEx" },
@@ -143,15 +143,15 @@ const RINGS: readonly Ring[] = [
   },
   {
     tag: "EXTERNAL",
-    title: "Olympus Arbiter",
+    title: "Ares Arbiter",
     glyph: "globe",
-    selectedButton: "clip-notch bg-panel border-mint/50 shadow-[inset_0_0_40px_rgba(87,224,255,0.04)]",
+    selectedButton: "clip-notch bg-panel border-mint/50 shadow-[inset_0_0_40px_rgba(239,121,94,0.04)]",
     selectedIcon: "border border-mint/30 bg-mint/10 text-mint",
     selectedLabel: "font-mono text-[10px] tracking-[0.3em] text-mint",
     selectedChevron: "text-mint translate-x-1",
     bar: "absolute inset-x-0 top-0 h-[2px] bg-mint",
     badge: "border px-2.5 py-1 font-mono text-[10px] tracking-[0.3em] border-mint/30 bg-mint/10 text-mint",
-    file: "arbiter.olympus · server-side",
+    file: "arbiter.ares · server-side",
     tagline: "The court of final appeal — off the client entirely.",
     taglineClass: "mt-2 font-mono text-xs tracking-[0.12em] text-mint",
     watermark: "h-14 w-14 md:h-20 md:w-20 text-mint opacity-80",
@@ -178,7 +178,7 @@ const DEFAULT_RING = 1;
 export default function Architecture(): JSX.Element {
   const [selected, setSelected] = useState(DEFAULT_RING);
   const ring = RINGS[selected] ?? RINGS[DEFAULT_RING];
-  if (ring === undefined) throw new Error("ZEUS landing: the ring table is empty");
+  if (ring === undefined) throw new Error("ARES landing: the ring table is empty");
 
   return (
     <section id="architecture" className="relative mx-auto max-w-[1440px] px-6 py-28 md:px-10 md:py-40">
@@ -193,7 +193,7 @@ export default function Architecture(): JSX.Element {
         </h2>
         <p className="mt-6 max-w-xl text-base leading-relaxed text-mist md:text-lg">
           Cheats operate at every depth of the operating system — from Notepad-grade memory editors to signed kernel
-          drivers. ZEUS mirrors that depth: each ring watches exactly what the others cannot see.
+          drivers. ARES mirrors that depth: each ring watches exactly what the others cannot see.
         </p>
       </Reveal>
 
@@ -201,8 +201,8 @@ export default function Architecture(): JSX.Element {
         <Reveal className="relative">
           <div className="relative flex flex-col gap-4 pl-6">
             <div className="absolute left-[5px] top-4 bottom-4 w-px bg-gradient-to-b from-line-2 via-volt/40 to-line-2" />
-            <span className="packet-dot absolute left-[2.5px] h-1.5 w-1.5 rounded-full bg-volt shadow-[0_0_12px_rgba(87,224,255,0.9)]" />
-            <span className="packet-dot absolute left-[2.5px] h-1.5 w-1.5 rounded-full bg-viol shadow-[0_0_12px_rgba(122,92,255,0.9)] [animation-delay:1.55s]" />
+            <span className="packet-dot absolute left-[2.5px] h-1.5 w-1.5 rounded-full bg-volt shadow-[0_0_12px_rgba(239,121,94,0.9)]" />
+            <span className="packet-dot absolute left-[2.5px] h-1.5 w-1.5 rounded-full bg-viol shadow-[0_0_12px_rgba(201,167,119,0.9)] [animation-delay:1.55s]" />
 
             {RINGS.map((entry, index) => {
               const active = index === selected;
@@ -243,7 +243,7 @@ export default function Architecture(): JSX.Element {
         <Reveal className="min-h-[560px]">
           <Reveal key={ring.tag} variant="blur" className="panel relative h-full overflow-hidden clip-notch">
             <span className={ring.bar} />
-            <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(87,224,255,0.09),transparent_65%)]" />
+            <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(239,121,94,0.09),transparent_65%)]" />
 
             <div className="relative flex h-full flex-col p-7 md:p-10">
               <div className="flex flex-wrap items-start justify-between gap-6">

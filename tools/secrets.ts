@@ -64,7 +64,7 @@ const ENV_TEMPLATE = ".env.example";
 const KEY_EXT: readonly string[] = [".pem", ".key", ".p12", ".pfx", ".jks"];
 
 /** The allowance marker, assembled so this file does not trip its own rule. */
-const ALLOW = "zeus-secrets" + ":allow";
+const ALLOW = "ares-secrets" + ":allow";
 const ALLOW_TAIL: RegExp = /^\s*:\s*(\S.*)$/;
 const CODE_EXT = /\.(ts|tsx|mts|cts|js|mjs|cjs|jsx|sh|ps1)$/;
 
@@ -410,7 +410,7 @@ groups.push({
   findings: bareAllowances,
 });
 
-const output: string[] = [" ZEUS secret hygiene — text only, no network, no dependencies", ""];
+const output: string[] = [" ARES secret hygiene — text only, no network, no dependencies", ""];
 let total = 0;
 for (const group of groups) {
   total += group.findings.length;

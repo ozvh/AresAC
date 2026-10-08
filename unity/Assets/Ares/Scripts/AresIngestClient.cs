@@ -1,7 +1,7 @@
 // Unity transport for the demo agent.
 //
 // The only file in this folder that references UnityEngine: signing, canonicalisation and
-// framing all live in ZeusWire.cs so the bytes can be reasoned about, and diffed against the
+// framing all live in AresWire.cs so the bytes can be reasoned about, and diffed against the
 // arbiter, without an editor.
 //
 // One batch, one principal. The arbiter refuses a batch that spans two agents, because a single
@@ -15,10 +15,10 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Zeus.Demo
+namespace Ares.Demo
 {
     /// <summary>Outcome of one ingest request, as the demo logs it.</summary>
-    public sealed class ZeusIngestResult
+    public sealed class AresIngestResult
     {
         /// <summary>True only on 202, the one status the ingest path accepts a batch with.</summary>
         public bool Ok;
@@ -31,41 +31,41 @@ namespace Zeus.Demo
         public bool Rejected { get { return Status == 400 || Status == 403 || Status == 409 || Status == 413 || Status == 415 || Status == 429; } }
     }
 
-    public sealed class ZeusIngestClient
+    public sealed class AresIngestClient
     {
         private readonly string _baseUrl;
-        private readonly ZeusAgent _agent;
+        private readonly AresAgent _agent;
 
-        public ZeusIngestClient(string baseUrl, ZeusAgent agent)
+        public AresIngestClient(string baseUrl, AresAgent agent)
         {
             _baseUrl = baseUrl.TrimEnd('/');
             _agent = agent;
         }
 
         public string Endpoint { get { return _baseUrl + "/v1/ingest"; } }
-        public ZeusAgent Agent { get { return _agent; } }
+        public AresAgent Agent { get { return _agent; } }
 
         /// <summary>
         /// Sign and post one batch. `onDone` runs whatever the outcome, including a transport
         /// failure: a demo that silently swallows a refused batch teaches the wrong thing.
         /// </summary>
-        public IEnumerator Send(List<ZeusEvent> batch, Action<ZeusIngestResult> onDone)
+        public IEnumerator Send(List<AresEvent> batch, Action<AresIngestResult> onDone)
         {
-            string canonical = ZeusWire.CanonicalBatch(batch);
-            string signature = ZeusWire.Sign(_agent.Key, canonical);
-            byte[] payload = Encoding.UTF8.GetBytes(ZeusWire.Body(batch));
+            string canonical = AresWire.CanonicalBatch(batch);
+            string signature = AresWire.Sign(_agent.Key, canonical);
+            byte[] payload = Encoding.UTF8.GetBytes(AresWire.Body(batch));
 
             using (UnityWebRequest request = new UnityWebRequest(Endpoint, "POST"))
             {
                 request.uploadHandler = new UploadHandlerRaw(payload);
                 request.downloadHandler = new DownloadHandlerBuffer();
                 request.SetRequestHeader("Content-Type", "application/json");
-                request.SetRequestHeader("x-zeus-sig", signature);
+                request.SetRequestHeader("x-ares-sig", signature);
                 request.timeout = 5;
 
                 yield return request.SendWebRequest();
 
-                ZeusIngestResult result = new ZeusIngestResult();
+                AresIngestResult result = new AresIngestResult();
                 // responseCode rather than the isNetworkError/isHttpError shortcuts: those were
                 // deprecated in Unity 2022 and the replacements do not exist in older editors.
                 // A status of 0 means the request never reached the arbiter at all.

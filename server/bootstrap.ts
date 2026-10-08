@@ -11,10 +11,12 @@
  * and the operator token are read from the environment, and when one is absent a fresh
  * value is generated for the lifetime of the process. That fallback is deliberately loud
  * in the returned `notices` rather than silent: a deployment that forgot to set
- * `ZEUS_SESSION_KEY` is not broken, it just logs everyone out on restart, and the operator
+ * `ARES_SESSION_KEY` is not broken, it just logs everyone out on restart, and the operator
  * should be told which of those two things is happening.
  */
 import { randomBytes } from "node:crypto";
+import { existsSync } from "node:fs";
+import { aresEnvironment } from "./legacy-env.ts";
 import { AgentRegistry } from "./agents.ts";
 import { Auth } from "./auth.ts";
 import { retentionDays, renewalNoticeDays, Store } from "./db.ts";
@@ -66,16 +68,16 @@ function secret(env: NodeJS.ProcessEnv, name: string, bytes: number, notices: st
 }
 
 export function bootstrap(options: BootstrapOptions = {}): System {
-  const env = options.env ?? process.env;
+  const env = aresEnvironment(options.env ?? process.env);
   const notices: string[] = [];
   const now = options.now ?? ((): number => Date.now());
 
   const { master, ephemeral } = AgentRegistry.masterFromEnv(env);
-  if (ephemeral) notices.push("ZEUS_MASTER_KEY is unset; the enrolled agent fleet changes on every boot");
+  if (ephemeral) notices.push("ARES_MASTER_KEY is unset; the enrolled agent fleet changes on every boot");
 
   // The store is opened before the ledger, because the ledger recovers its chain from it:
   // the running head and sequence must come from what is on disk, not from a fresh zero.
-  const dbFile = options.dbFile ?? env["ZEUS_DB"] ?? ".zeus-data/zeus.db";
+  const dbFile = options.dbFile ?? env["ARES_DB"] ?? (existsSync(".zeus-data/zeus.db") ? ".zeus-data/zeus.db" : ".ares-data/ares.db");
   const store = new Store({ file: dbFile, now });
 
   const registry = new AgentRegistry(master);
@@ -91,18 +93,18 @@ export function bootstrap(options: BootstrapOptions = {}): System {
   const arbiter = new Arbiter(ledger);
   const bus = new Broadcaster(LIMITS.replayRing);
   const fleet = new Fleet(registry, {
-    sessions: options.sessions ?? Number(env["ZEUS_SESSIONS"] ?? 6),
-    tps: options.tps ?? Number(env["ZEUS_TPS"] ?? 0),
+    sessions: options.sessions ?? Number(env["ARES_SESSIONS"] ?? 6),
+    tps: options.tps ?? Number(env["ARES_TPS"] ?? 0),
     origin: `http://127.0.0.1:${options.port ?? Number(env["PORT"] ?? 8787)}`,
-    seed: options.seed ?? Number(env["ZEUS_SEED"] ?? 0x5eed),
+    seed: options.seed ?? Number(env["ARES_SEED"] ?? 0x5eed),
   });
 
   const auth = new Auth({
     store,
     // Not the master key. A telemetry MAC key and a session key are different authorities,
     // and one derivation serving both means a leak of either is a leak of both.
-    sessionKey: secret(env, "ZEUS_SESSION_KEY", 32, notices),
-    cookieSecure: env["ZEUS_COOKIE_SECURE"] === "1",
+    sessionKey: secret(env, "ARES_SESSION_KEY", 32, notices),
+    cookieSecure: env["ARES_COOKIE_SECURE"] === "1",
     now,
   });
 
@@ -111,7 +113,7 @@ export function bootstrap(options: BootstrapOptions = {}): System {
   const subs = new Subscriptions({ store, mailer, now, noticeDays: renewalNoticeDays(env) });
   const uploads = new UploadService({
     store,
-    files: new UploadStore(options.uploadDir ?? env["ZEUS_UPLOAD_DIR"] ?? ".zeus-data/uploads"),
+    files: new UploadStore(options.uploadDir ?? env["ARES_UPLOAD_DIR"] ?? (existsSync(".zeus-data/uploads") ? ".zeus-data/uploads" : ".ares-data/uploads")),
     now,
     retentionDays: retentionDays(env),
   });
@@ -134,10 +136,10 @@ export function bootstrap(options: BootstrapOptions = {}): System {
 }
 
 function resolveOperatorToken(env: NodeJS.ProcessEnv, notices: string[]): string {
-  const raw = env["ZEUS_OPERATOR_TOKEN"];
+  const raw = env["ARES_OPERATOR_TOKEN"];
   if (typeof raw === "string" && raw.length >= 32) return raw;
   if (typeof raw === "string" && raw !== "") {
-    notices.push("ZEUS_OPERATOR_TOKEN is shorter than 32 characters; a fresh token was generated instead");
+    notices.push("ARES_OPERATOR_TOKEN is shorter than 32 characters; a fresh token was generated instead");
   }
   return randomBytes(24).toString("hex");
 }

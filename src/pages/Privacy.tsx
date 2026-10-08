@@ -32,10 +32,10 @@ import { PLAN_LABEL } from "@shared/protocol";
 /** Matches `PRIVACY_VERSION` in `server/auth.ts`. Consent rows cite this exact string. */
 const VERSION = "2026-10-07";
 
-/** Matches the default of `ZEUS_UPLOAD_RETENTION_DAYS` in `server/db.ts`. */
+/** Matches the default of `ARES_UPLOAD_RETENTION_DAYS` in `server/db.ts`. */
 const UPLOAD_RETENTION_DAYS = 30;
 
-/** Matches the default of `ZEUS_RENEWAL_NOTICE_DAYS`. */
+/** Matches the default of `ARES_RENEWAL_NOTICE_DAYS`. */
 const RENEWAL_NOTICE_DAYS = 14;
 
 /**
@@ -84,7 +84,7 @@ export default function Privacy(): JSX.Element {
     <div className="flex min-h-screen flex-col bg-void text-fg">
       <header className="flex h-[30px] shrink-0 items-center justify-between gap-4 border-b border-line bg-panel px-2 text-[10px] uppercase tracking-[0.18em]">
         <span className="flex items-center gap-3">
-          <span className="text-fg">ZEUS // PRIVACY POLICY</span>
+          <span className="text-fg">ARES // PRIVACY POLICY</span>
           <span className="num text-dimmer">{`VERSION ${VERSION}`}</span>
         </span>
         <span className="flex items-center gap-3">

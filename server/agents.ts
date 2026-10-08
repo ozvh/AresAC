@@ -29,7 +29,7 @@ export class AgentRegistry {
 
   /** Derive the master secret from the environment, or mint an ephemeral one. */
   static masterFromEnv(env: NodeJS.ProcessEnv): { master: Buffer; ephemeral: boolean } {
-    const raw = env["ZEUS_MASTER_KEY"];
+    const raw = env["ARES_MASTER_KEY"];
     if (typeof raw === "string" && /^[0-9a-f]{64}$/i.test(raw)) {
       return { master: Buffer.from(raw, "hex"), ephemeral: false };
     }

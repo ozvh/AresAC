@@ -164,7 +164,7 @@ button:disabled {
  *     `background-color: var(--color-panel)`. Redefining a token on
  *     `.landing` therefore retints every utility inside it while the
  *     console keeps the value it already had. That is how `--color-panel`
- *     can be #0a0a0a for the console and #0a101d for the landing without a
+ *     can be #0a0a0a for the console and #1c1315 for the landing without a
  *     second stylesheet or a renamed utility.
  *
  *  2. REVERT-LAYER HANDS PROPERTIES BACK. The console's `*, *::before,
@@ -183,16 +183,16 @@ button:disabled {
      purely additive. The four tokens that DO collide — --color-panel,
      --color-line, --font-display, --font-mono — are redefined on .landing below
      rather than here, so that the console keeps the value it shipped with. */
-  --color-abyss: #04060c;
-  --color-ink: #070b14;
-  --color-panel-2: #0d1424;
-  --color-line-2: #94b4ff2e;
-  --color-volt: #57e0ff;
-  --color-viol: #7a5cff;
+  --color-abyss: #100b0c;
+  --color-ink: #181012;
+  --color-panel-2: #231719;
+  --color-line-2: #c9a7772e;
+  --color-volt: #ef795e;
+  --color-viol: #c9a777;
   --color-bolt: #ffc24b;
   --color-blood: #ff4d5e;
   --color-mint: #4ade80;
-  --color-mist: #9fb2d8;
+  --color-mist: #c9b7ae;
 
   /* Six animations, named here and keyed at the foot of this file. `animate-ping`
      and `animate-bounce` are Tailwind defaults and are not redeclared. */
@@ -214,7 +214,7 @@ button:disabled {
     border: 1px solid var(--color-line);
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
-    background: linear-gradient(160deg, #10182bb8, #080c16e6);
+    background: linear-gradient(160deg, #342022b8, #160f10e6);
   }
 
   /* The clipped corner: 18px off two opposite corners, the shape that keeps this
@@ -223,24 +223,24 @@ button:disabled {
     clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
   }
 
-  /* Outline type. The stroke, not a shadow, is what makes the three stacked ZEUS
+  /* Outline type. The stroke, not a shadow, is what makes the three stacked ARES
      marks read as depth. */
   .text-hollow {
     color: transparent;
-    -webkit-text-stroke: 1.5px #9fb2d861;
+    -webkit-text-stroke: 1.5px #c9b7ae61;
   }
   .text-hollow-volt {
     color: transparent;
-    -webkit-text-stroke: 1.5px #57e0ffa6;
+    -webkit-text-stroke: 1.5px #ef795ea6;
   }
 
   .glow-volt {
-    box-shadow: 0 0 24px #57e0ff38, 0 0 90px #57e0ff14;
+    box-shadow: 0 0 24px #ef795e38, 0 0 90px #ef795e14;
   }
 
   /* The faint 72px blueprint grid behind everything, faded out by a radial mask. */
   .grid-lines {
-    background-image: linear-gradient(#94b4ff0b 1px, #0000 1px), linear-gradient(90deg, #94b4ff0b 1px, #0000 1px);
+    background-image: linear-gradient(#c9a7770b 1px, #0000 1px), linear-gradient(90deg, #c9a7770b 1px, #0000 1px);
     background-size: 72px 72px;
     -webkit-mask-image: radial-gradient(90% 70% at 50% 30%, #000 30%, #0000 75%);
     mask-image: radial-gradient(90% 70% at 50% 30%, #000 30%, #0000 75%);
@@ -283,8 +283,8 @@ button:disabled {
  * 16px body and proportional figures from the browser.
  */
 .landing {
-  --color-panel: #0a101d;
-  --color-line: #94b4ff1a;
+  --color-panel: #1c1315;
+  --color-line: #c9a7771a;
   --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
@@ -337,7 +337,7 @@ button:disabled {
    the console's pure black, one shade off its own abyss. */
 html:has(.landing),
 body:has(.landing) {
-  background: #04060c;
+  background: #100b0c;
 }
 
 /*

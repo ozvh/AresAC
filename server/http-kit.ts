@@ -163,7 +163,7 @@ export function jsonContentType(req: IncomingMessage): boolean {
  */
 export function sourceOf(req: IncomingMessage): string {
   const socket = req.socket.remoteAddress ?? "unknown";
-  if (process.env["ZEUS_TRUST_PROXY"] !== "1") return socket;
+  if (process.env["ARES_TRUST_PROXY"] !== "1") return socket;
   const forwarded = header(req, "x-forwarded-for");
   if (forwarded === null) return socket;
   const parts = forwarded.split(",");
@@ -193,3 +193,4 @@ export function addCookie(res: ServerResponse, cookie: string): void {
   }
   res.setHeader("Set-Cookie", [String(existing), cookie]);
 }
+import "./legacy-env.ts";

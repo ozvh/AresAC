@@ -175,7 +175,7 @@ async function handle(req: IncomingMessage, res: ServerResponse, config: Transpo
     }
 
     const agent = runtime.registry.get(first.a);
-    const sig = header(req, "x-zeus-sig");
+    const sig = header(req, "x-ares-sig");
     if (agent === undefined || sig === null) {
       runtime.arbiter.countRejected("sig");
       return fail(res, 401, "SIG", "unauthenticated generator");
@@ -301,7 +301,7 @@ async function handle(req: IncomingMessage, res: ServerResponse, config: Transpo
     if (method !== "POST") return fail(res, 405, "BAD_METHOD", "POST required");
     if (!originAllowed(req, config.consoleOrigins)) return fail(res, 403, "FORBIDDEN", "origin refused");
 
-    const presented = header(req, "x-zeus-op") ?? "";
+    const presented = header(req, "x-ares-op") ?? "";
     if (!constantTimeEqual(presented, runtime.operatorToken)) {
       return fail(res, 403, "FORBIDDEN", "operator token required");
     }
@@ -405,7 +405,7 @@ async function handle(req: IncomingMessage, res: ServerResponse, config: Transpo
       res,
       200,
       [
-        "ZEUS arbiter",
+        "ARES arbiter",
         "",
         "status   : listening (API only)",
         "console  : served by the Vite dev server in development",

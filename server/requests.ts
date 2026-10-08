@@ -189,7 +189,7 @@ function profileNote(profile: BuildProfile): string {
 
 function compose(input: BuildRequestInput, ref: string, source: string, now: number): MailMessage {
   const lines = [
-    "ZEUS build request",
+    "ARES build request",
     "",
     `ref        ${ref}`,
     `received   ${new Date(now).toISOString()}`,
@@ -212,7 +212,7 @@ function compose(input: BuildRequestInput, ref: string, source: string, now: num
     to: "",
     from: "",
     replyTo: input.em,
-    subject: `[ZEUS] build request ${input.tgt} // ${input.nm}`,
+    subject: `[ARES] build request ${input.tgt} // ${input.nm}`,
     text: lines.join("\n"),
   };
 }

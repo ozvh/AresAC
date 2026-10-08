@@ -207,7 +207,7 @@ export class Subscriptions {
       const amount = spec.amountCents === 0 ? "no charge" : `${(spec.amountCents / 100).toFixed(2)}`;
 
       const text = [
-        "ZEUS subscription notice",
+        "ARES subscription notice",
         "",
         `This is the notice that precedes a renewal.`,
         "",
@@ -230,7 +230,7 @@ export class Subscriptions {
         to: user.email,
         from: this.#mailer.from,
         replyTo: null,
-        subject: `[ZEUS] your ${spec.label} subscription renews on ${when}`,
+        subject: `[ARES] your ${spec.label} subscription renews on ${when}`,
         text,
       });
 

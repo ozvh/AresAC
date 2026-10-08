@@ -9,7 +9,7 @@
  * Three properties are non-negotiable in this file, and each one exists because the
  * alternative silently damages the suite:
  *
- *  - THE DATABASE IS IN MEMORY. A test run must not leave a `zeus.db` behind, and a suite
+ *  - THE DATABASE IS IN MEMORY. A test run must not leave a `ares.db` behind, and a suite
  *    whose state persists between runs is a suite that passes for the wrong reason.
  *  - THE RELAY IS UNREACHABLE AND UNC[REDENTIALED]. No test may emit mail to a real
  *    address, so a request that reaches the relay lands in the spool instead. Where a test
@@ -62,10 +62,10 @@ export function testSystem(parts: TestRuntimeParts): TestSystem {
   const store = new Store({ file: ":memory:", now });
   const mailer = new Mailer({
     apiKey: parts.relay?.apiKey ?? "",
-    from: "ZEUS Arbiter <onboarding@resend.dev>",
+    from: "ARES Arbiter <onboarding@resend.dev>",
     recipient: parts.relay?.recipient ?? "cagelove094@gmail.com",
     endpoint: parts.relay?.endpoint ?? "http://127.0.0.1:1/emails",
-    spoolPath: parts.spoolPath ?? path.join(os.tmpdir(), `zeus-test-${randomBytes(6).toString("hex")}.log`),
+    spoolPath: parts.spoolPath ?? path.join(os.tmpdir(), `ares-test-${randomBytes(6).toString("hex")}.log`),
     timeoutMs: 150,
   });
   const auth = new Auth({
@@ -86,7 +86,7 @@ export function testSystem(parts: TestRuntimeParts): TestSystem {
     subs: new Subscriptions({ store, mailer, now, noticeDays: parts.noticeDays ?? 14 }),
     uploads: new UploadService({
       store,
-      files: new UploadStore(parts.uploadRoot ?? path.join(os.tmpdir(), `zeus-uploads-${randomBytes(6).toString("hex")}`)),
+      files: new UploadStore(parts.uploadRoot ?? path.join(os.tmpdir(), `ares-uploads-${randomBytes(6).toString("hex")}`)),
       now,
       retentionDays: parts.retentionDays ?? 30,
     }),

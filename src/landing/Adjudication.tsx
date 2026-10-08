@@ -173,7 +173,7 @@ export default function Adjudication(): JSX.Element {
           <div className="relative">
             {/* The spine: one hairline behind all four cards, with a single pulse travelling it. */}
             <div className="absolute bottom-2 left-[23px] top-2 w-px bg-gradient-to-b from-volt/50 via-line-2 to-bolt/40" />
-            <span className="spine-pulse absolute left-[20px] h-2 w-2 rounded-full bg-volt shadow-[0_0_16px_rgba(87,224,255,1)]" />
+            <span className="spine-pulse absolute left-[20px] h-2 w-2 rounded-full bg-volt shadow-[0_0_16px_rgba(239,121,94,1)]" />
 
             <div className="flex flex-col gap-10">
               {GATES.map((gate) => (
@@ -230,9 +230,9 @@ export default function Adjudication(): JSX.Element {
             <div className="panel overflow-hidden">
               <div className="relative">
                 <img
-                  alt="Marble bust of Zeus under electric light"
+                  alt="Ares helmet emblem in bronze and crimson"
                   className="h-[420px] w-full object-cover object-top [mask-image:linear-gradient(to_bottom,black_55%,transparent_98%)]"
-                  src="/images/zeus-bust.jpg"
+                  src="/images/ares-helmet.svg"
                 />
                 <span className="pointer-events-none absolute inset-x-0 top-0 h-full animate-scanline bg-gradient-to-b from-transparent via-volt/[0.08] to-transparent" />
                 <div className="absolute left-5 top-5 flex items-center gap-2 border border-line bg-abyss/70 px-3 py-1.5 font-mono text-[10px] tracking-[0.28em] text-volt backdrop-blur">
@@ -243,7 +243,7 @@ export default function Adjudication(): JSX.Element {
                     The burden of proof is on the machine.
                   </p>
                   <p className="mt-2 text-sm leading-relaxed text-mist">
-                    Every false positive is a player executed by accident. ZEUS holds itself to a courtroom standard —
+                    Every false positive is a player executed by accident. ARES holds itself to a courtroom standard —
                     or it doesn't act.
                   </p>
                 </div>

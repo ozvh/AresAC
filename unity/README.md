@@ -1,4 +1,4 @@
-# ZEUS — Unity demo client
+# ARES — Unity demo client
 
 A **demo**. Not the release build, not a shipping integration.
 
@@ -12,14 +12,14 @@ believed after the server matches them to a provisioned role.
 
 ## Drop it in
 
-Copy `Assets/Zeus` into your Unity project's `Assets/` folder. Three files, no packages, no
+Copy `Assets/Ares` into your Unity project's `Assets/` folder. Three files, no packages, no
 `manifest.json` changes:
 
 | File | What it is |
 |---|---|
-| `Scripts/ZeusWire.cs` | The wire core: canonical string, HMAC, JSON framing, agent derivation. **No `UnityEngine` reference** — plain C# so the bytes can be read and diffed without an editor. |
-| `Scripts/ZeusIngestClient.cs` | The Unity transport: `UnityWebRequest` POST to `/v1/ingest`. The only file that imports `UnityEngine`. |
-| `Scripts/ZeusDemoAgent.cs` | A `MonoBehaviour` that plays the demo timeline. |
+| `Scripts/AresWire.cs` | The wire core: canonical string, HMAC, JSON framing, agent derivation. **No `UnityEngine` reference** — plain C# so the bytes can be read and diffed without an editor. |
+| `Scripts/AresIngestClient.cs` | The Unity transport: `UnityWebRequest` POST to `/v1/ingest`. The only file that imports `UnityEngine`. |
+| `Scripts/AresDemoAgent.cs` | A `MonoBehaviour` that plays the demo timeline. |
 
 ## Run it
 
@@ -32,7 +32,7 @@ npm run demo:unity -- --server-only # arbiter only, for the real Unity client
 
 Unity, in a new empty scene:
 
-1. Create an empty GameObject and add the `ZeusDemoAgent` component.
+1. Create an empty GameObject and add the `AresDemoAgent` component.
 2. Leave `Base Url` at `http://127.0.0.1:8799` unless you passed `--port`.
 3. Press **Play**.
 
@@ -65,7 +65,7 @@ merely touched once.
 ## How the client is provisioned without any credential being transferred
 
 The production system has no external enrolment exchange: an agent key is derived from
-`ZEUS_MASTER_KEY` and a counter, and only the arbiter process holds it. A game on another
+`ARES_MASTER_KEY` and a counter, and only the arbiter process holds it. A game on another
 machine therefore cannot be provisioned — that gap is listed as a known limitation in the root
 `README.md`, and closing it properly needs a per-agent enrolment exchange that does not exist
 yet.
@@ -74,7 +74,7 @@ For the demo, both sides compute the same identity from a **published** recipe
 (`tools/demo-agents.ts`):
 
 ```
-master   = SHA256("zeus-unity-demo/loopback-only-not-a-production-secret")   32 bytes
+master   = SHA256("ares-unity-demo/loopback-only-not-a-production-secret")   32 bytes
 agent id = hex(HMAC_SHA256(master, "agent-id:<role>:<counter>"))[0..16]
 agent key= HMAC_SHA256(master, "agent-key:<id>")                            32 bytes
 signature= hex(HMAC_SHA256(key, join("\n", canonical(each event))))

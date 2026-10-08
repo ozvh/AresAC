@@ -61,7 +61,7 @@ function makeRuntime(parts: {
   const store = new Store({ file: ":memory:", now: () => Date.now() });
   const mailer = new Mailer({
     apiKey: "",
-    from: "ZEUS Load Harness <offline@invalid>",
+    from: "ARES Load Harness <offline@invalid>",
     recipient: "offline@invalid",
     endpoint: "http://127.0.0.1:1/emails",
     spoolPath: "offline-requests.log",
@@ -196,7 +196,7 @@ async function run(base: string, registry: AgentRegistry, setup: Approach): Prom
         method: "POST",
         headers: {
           "content-type": "application/json",
-          "x-zeus-sig": signEvent(principal.agent.key, events.map((e) => canonicalEvent(e)).join("\n")),
+          "x-ares-sig": signEvent(principal.agent.key, events.map((e) => canonicalEvent(e)).join("\n")),
         },
         body: JSON.stringify(events),
       });
@@ -277,7 +277,7 @@ async function main(): Promise<void> {
   const base = `http://127.0.0.1:${port}`;
   runtime.start();
 
-  process.stdout.write(`\nZEUS ingest load harness — arbiter on ${base} (fleet disabled)\n`);
+  process.stdout.write(`\nARES ingest load harness — arbiter on ${base} (fleet disabled)\n`);
 
   await run(base, registry, {
     label: "PROBE — small fleet, pushed past its budget",

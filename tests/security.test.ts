@@ -151,7 +151,7 @@ test("an unknown account costs the same work as a known one", async () => {
 /* ------------------------------------------------------------------ */
 
 test("the database enforces its own rules rather than trusting the caller", async () => {
-  const dir = await mkdtemp(path.join(os.tmpdir(), "zeus-db-"));
+  const dir = await mkdtemp(path.join(os.tmpdir(), "ares-db-"));
   const file = path.join(dir, "rules.db");
   const store = new Store({ file, now: () => Date.now() });
 
@@ -252,13 +252,13 @@ let relayServer: Server;
 let dbDir = "";
 
 before(async () => {
-  dbDir = await mkdtemp(path.join(os.tmpdir(), "zeus-sec-"));
+  dbDir = await mkdtemp(path.join(os.tmpdir(), "ares-sec-"));
 
   // A trusted proxy is declared, so the harness's rotating forwarded address is honoured,
   // and the global signup flood gate is raised for the run: forty accounts in three
   // seconds is a legitimate client, not a flood. Both are restored in `after`.
-  process.env["ZEUS_TRUST_PROXY"] = "1";
-  process.env["ZEUS_SIGNUP_PER_MIN"] = "600";
+  process.env["ARES_TRUST_PROXY"] = "1";
+  process.env["ARES_SIGNUP_PER_MIN"] = "600";
 
   const captured: Array<Record<string, unknown>> = [];
   relayServer = createServer((req: IncomingMessage, res) => {
@@ -306,8 +306,8 @@ before(async () => {
 after(async () => {
   await new Promise<void>((resolve) => server.close(() => resolve()));
   await new Promise<void>((resolve) => relayServer.close(() => resolve()));
-  delete process.env["ZEUS_TRUST_PROXY"];
-  delete process.env["ZEUS_SIGNUP_PER_MIN"];
+  delete process.env["ARES_TRUST_PROXY"];
+  delete process.env["ARES_SIGNUP_PER_MIN"];
 });
 
 test("a forwarded address is a claim, not a fact, unless a proxy is declared", () => {
@@ -318,17 +318,17 @@ test("a forwarded address is a claim, not a fact, unless a proxy is declared", (
     headers: { "x-forwarded-for": "10.9.9.9, 198.51.100.7" },
   } as unknown as IncomingMessage;
 
-  const previous = process.env["ZEUS_TRUST_PROXY"];
+  const previous = process.env["ARES_TRUST_PROXY"];
   try {
-    process.env["ZEUS_TRUST_PROXY"] = "0";
+    process.env["ARES_TRUST_PROXY"] = "0";
     assert.equal(sourceOf(spoofed), "203.0.113.9", "an untrusted header must not choose the bucket");
-    process.env["ZEUS_TRUST_PROXY"] = "1";
+    process.env["ARES_TRUST_PROXY"] = "1";
     // The rightmost entry is the hop the trusted proxy itself appended. Taking the
     // leftmost — the usual mistake — hands the caller its own key.
     assert.equal(sourceOf(spoofed), "198.51.100.7");
   } finally {
-    if (previous === undefined) delete process.env["ZEUS_TRUST_PROXY"];
-    else process.env["ZEUS_TRUST_PROXY"] = previous;
+    if (previous === undefined) delete process.env["ARES_TRUST_PROXY"];
+    else process.env["ARES_TRUST_PROXY"] = previous;
   }
 });
 
@@ -605,8 +605,8 @@ test("a customer session is refused an administrator route and the attempt is re
 test("administrator routes are refused until a bootstrap password has been changed", async () => {
   const auth = harness.system.auth;
   await auth.ensureBootstrapAdmin({
-    ZEUS_BOOTSTRAP_ADMIN_EMAIL: "root@example.com",
-    ZEUS_BOOTSTRAP_ADMIN_PASSWORD: "a bootstrap password that is long",
+    ARES_BOOTSTRAP_ADMIN_EMAIL: "root@example.com",
+    ARES_BOOTSTRAP_ADMIN_PASSWORD: "a bootstrap password that is long",
   });
 
   const signin = await post("/v1/auth/login", {
@@ -1055,11 +1055,11 @@ test("an account response carries no credential material", async () => {
 
 const SECURE_ENV: NodeJS.ProcessEnv = {
   NODE_ENV: "production",
-  ZEUS_SESSION_KEY: "a".repeat(64),
-  ZEUS_MASTER_KEY: "b".repeat(64),
-  ZEUS_OPERATOR_TOKEN: "c".repeat(48),
-  ZEUS_TRUST_PROXY: "1",
-  ZEUS_BOOTSTRAP_ADMIN_PASSWORD: "a bootstrap password long enough to pass",
+  ARES_SESSION_KEY: "a".repeat(64),
+  ARES_MASTER_KEY: "b".repeat(64),
+  ARES_OPERATOR_TOKEN: "c".repeat(48),
+  ARES_TRUST_PROXY: "1",
+  ARES_BOOTSTRAP_ADMIN_PASSWORD: "a bootstrap password long enough to pass",
 };
 
 test("an insecure production configuration is refused rather than tolerated", () => {
@@ -1074,9 +1074,9 @@ test("an insecure production configuration is refused rather than tolerated", ()
   // this configuration. A deployment like this must not reach the point of accepting
   // traffic and looking healthy in a monitor.
   assert.ok(insecure.fatal.some((entry) => /COOKIE_SECURE/.test(entry)), "a session cookie without Secure must stop the process");
-  assert.ok(insecure.fatal.some((entry) => /ZEUS_SESSION_KEY/.test(entry)));
-  assert.ok(insecure.fatal.some((entry) => /ZEUS_MASTER_KEY/.test(entry)));
-  assert.ok(insecure.fatal.some((entry) => /ZEUS_OPERATOR_TOKEN/.test(entry)));
+  assert.ok(insecure.fatal.some((entry) => /ARES_SESSION_KEY/.test(entry)));
+  assert.ok(insecure.fatal.some((entry) => /ARES_MASTER_KEY/.test(entry)));
+  assert.ok(insecure.fatal.some((entry) => /ARES_OPERATOR_TOKEN/.test(entry)));
   assert.ok(insecure.fatal.some((entry) => /console\.example\.com/.test(entry)), "a plaintext remote origin must stop the process");
   assert.ok(insecure.warnings.some((entry) => /TLS/.test(entry)), "a missing TLS story is a warning, because a proxy may terminate it");
 
@@ -1092,7 +1092,7 @@ test("an insecure production configuration is refused rather than tolerated", ()
   // A short bootstrap credential is refused: it is the one password this system chooses
   // for the operator, and a weak one makes every other control in this file irrelevant.
   const short = productionReadiness({
-    env: { ...SECURE_ENV, ZEUS_BOOTSTRAP_ADMIN_PASSWORD: "short" },
+    env: { ...SECURE_ENV, ARES_BOOTSTRAP_ADMIN_PASSWORD: "short" },
     cookieSecure: true,
     origins: ["https://console.example.com"],
     tls: true,

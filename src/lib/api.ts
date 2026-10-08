@@ -55,7 +55,7 @@ export async function sendControl(action: ControlAction): Promise<ControlOutcome
       method: "POST",
       headers: {
         "content-type": "application/json",
-        "x-zeus-op": token,
+        "x-ares-op": token,
       },
       body: JSON.stringify(action),
     });

@@ -36,14 +36,14 @@ import Signup from "./pages/Signup";
  * this switch let anyone reach it.
  */
 const SURFACES: Readonly<Record<string, { readonly component: () => React.JSX.Element; readonly title: string }>> = {
-  "/": { component: Landing, title: "ZEUS — Multi-Layer Anti-Cheat Architecture" },
-  "/console": { component: App, title: "ZEUS // ARBITER CONSOLE" },
-  "/request": { component: BuildRequest, title: "ZEUS // BUILD REQUEST" },
-  "/signup": { component: Signup, title: "ZEUS // CREATE AN ACCOUNT" },
-  "/login": { component: Login, title: "ZEUS // SIGN IN" },
-  "/account": { component: Account, title: "ZEUS // YOUR ACCOUNT" },
-  "/admin": { component: Admin, title: "ZEUS // ADMINISTRATION" },
-  "/privacy": { component: Privacy, title: "ZEUS // PRIVACY POLICY" },
+  "/": { component: Landing, title: "Ares Anti Cheat — Evidence-led protection" },
+  "/console": { component: App, title: "ARES // ARBITER CONSOLE" },
+  "/request": { component: BuildRequest, title: "ARES // BUILD REQUEST" },
+  "/signup": { component: Signup, title: "ARES // CREATE AN ACCOUNT" },
+  "/login": { component: Login, title: "ARES // SIGN IN" },
+  "/account": { component: Account, title: "ARES // YOUR ACCOUNT" },
+  "/admin": { component: Admin, title: "ARES // ADMINISTRATION" },
+  "/privacy": { component: Privacy, title: "ARES // PRIVACY POLICY" },
 };
 
 /**
@@ -59,14 +59,14 @@ function surface(pathname: string): { readonly component: () => React.JSX.Elemen
   const path = pathname.replace(/\/+$/, "") === "" ? "/" : pathname.replace(/\/+$/, "");
   const found = SURFACES[path];
   if (found !== undefined) return found;
-  return { component: Landing, title: "ZEUS — Multi-Layer Anti-Cheat Architecture" };
+  return { component: Landing, title: "Ares Anti Cheat — Evidence-led protection" };
 }
 
 const root = document.getElementById("root");
 if (root === null) {
   // The shell in index.html always provides this node. Failing loudly beats mounting into
   // nothing and leaving a blank page with no explanation.
-  throw new Error("ZEUS: #root is missing from the document");
+  throw new Error("ARES: #root is missing from the document");
 }
 
 const chosen = surface(window.location.pathname);

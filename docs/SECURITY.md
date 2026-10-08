@@ -1,6 +1,6 @@
 # Security
 
-This document is the security record for the ZEUS arbiter: what is implemented, where it
+This document is the security record for the ARES arbiter: what is implemented, where it
 lives, and what is still missing. It is written to be read top to bottom by whoever
 deploys this, and every claim in it names the file that makes the claim true. Where a
 control is not implemented, that is stated under its own heading rather than softened into
@@ -45,7 +45,7 @@ Secrets are read from the environment only. There is no secret literal in `serve
 `shared/`, `tools/` or `src/`. `server/bootstrap.ts` resolves the session key, telemetry
 master key, operator token and mail relay configuration in one place; the bootstrap
 administrator credential is read by `ensureBootstrapAdmin()` from `server/index.ts`; and
-`server/mailer.ts` builds its endpoint from `ZEUS_REQUEST_ENDPOINT`.
+`server/mailer.ts` builds its endpoint from `ARES_REQUEST_ENDPOINT`.
 
 Residual: an operator can still paste a real key into `.env.example`. That file is
 tracked, and review must treat any non-placeholder value in it as a leak.
@@ -62,8 +62,8 @@ disk. See §23 for the non-local path and the Secrets section in `README.md`.
 
 ### 3. Keys not committed
 
-`.gitignore` excludes `.env`, `*.pem`, `*.key`, `*.crt`, `.zeus-data/`, `*.db*`,
-`.zeus-*.log`, `*.log`, `.zeus-requests.log`, `uploads/`, `quarantine/`, `dist/` and
+`.gitignore` excludes `.env`, `*.pem`, `*.key`, `*.crt`, `.ares-data/`, `*.db*`,
+`.ares-*.log`, `*.log`, `.ares-requests.log`, `uploads/`, `quarantine/`, `dist/` and
 `node_modules/`. `npm run security:secrets` (`tools/secrets.ts`) fails the build if a
 tracked file contains a secret-shaped literal, a private key block, or an `.env` file that
 is not the template.
@@ -188,7 +188,7 @@ refused.
 
 | Boundary | Limit | Where |
 | --- | --- | --- |
-| Signup | 12/min, burst 6 per source, **plus** 6/min, burst 3 process-wide; the process-wide ceiling is the one adjustable limit (`ZEUS_SIGNUP_PER_MIN`), the per-source gate is not | `server/routes-auth.ts` |
+| Signup | 12/min, burst 6 per source, **plus** 6/min, burst 3 process-wide; the process-wide ceiling is the one adjustable limit (`ARES_SIGNUP_PER_MIN`), the per-source gate is not | `server/routes-auth.ts` |
 | Login | 12/min, burst 6 per source | `server/routes-auth.ts` |
 | Upload | 10/min, burst 5 per account | `server/routes-auth.ts` |
 | Build request | 2/min, burst 2 per source **and** 20/min, burst 20 process-wide | `shared/protocol.ts` `REQUEST_LIMITS`, charged in `server/requests.ts` |
@@ -196,7 +196,7 @@ refused.
 | Control plane | one action per `LIMITS.controlMinIntervalMs` | `server/http.ts` |
 
 Bucket keys are charged against `sourceOf()` (`server/http-kit.ts`), which uses the socket
-address and consults `x-forwarded-for` **only** when `ZEUS_TRUST_PROXY=1`, and then takes
+address and consults `x-forwarded-for` **only** when `ARES_TRUST_PROXY=1`, and then takes
 the **rightmost** entry — the hop the trusted proxy appended. Trusting the leftmost entry
 would let a caller choose its own bucket key.
 
@@ -208,7 +208,7 @@ store, or the limits multiply by the number of processes.
 `server/auth.ts`. A synchroniser token, not a double-submit cookie. The token is
 **derived, not stored**: `Auth.csrfFor(rawSessionCookie)` returns
 `HMAC(sessionKey, "csrf" + "\u0000" + cookie)`, and `GET /v1/auth/me` returns that value.
-It must come back in the `x-zeus-csrf` header on every mutation, where
+It must come back in the `x-ares-csrf` header on every mutation, where
 `verifyCsrf(identity, rawCookie, presented)` recomputes it, first checks the stored
 `csrf_hash` as tamper evidence, and then compares in constant time. A cross-site request can
 carry the cookie but cannot read this session's response, so it cannot obtain the token.
@@ -228,7 +228,7 @@ setter for `csrf_hash` in `server/db.ts`.
 **No `Access-Control-*` header is emitted anywhere.** The origin check in
 `server/http-kit.ts` `originAllowed()` is a request-admission test, not a grant: an allowed
 origin is permitted to make the request, and still cannot read the response cross-origin
-because the browser receives no permission header. `ZEUS_CONSOLE_ORIGINS` is the exact-match
+because the browser receives no permission header. `ARES_CONSOLE_ORIGINS` is the exact-match
 list of origins permitted to call the API from a browser. A request with no `Origin` header
 is allowed through, because a non-browser principal has no ambient credentials to spend —
 which is what lets the enrolled agent fleet authenticate by MAC.
@@ -239,7 +239,7 @@ or same-origin with the arbiter (`--serve-static=dist`).
 ### 14. HTTPS
 
 Direct TLS is implemented and optional. `server/index.ts` `resolveTls()` reads
-`ZEUS_TLS_CERT` and `ZEUS_TLS_KEY` as PEM file paths, and `createArbiterServer()` in
+`ARES_TLS_CERT` and `ARES_TLS_KEY` as PEM file paths, and `createArbiterServer()` in
 `server/http.ts` builds an `https.createServer` from that material; the boot banner's
 `transport` line states which listener is running.
 
@@ -274,11 +274,11 @@ payload leaves the origin is the same-origin `fetch` the pages already make.
 ### 16. Secure cookies
 
 `serialiseCookie()` in `server/auth.ts` emits `Path=/`, `HttpOnly`, `SameSite=Strict`, and
-`Secure` when `ZEUS_COOKIE_SECURE=1`. No `Domain` attribute, so the cookie is first-party
+`Secure` when `ARES_COOKIE_SECURE=1`. No `Domain` attribute, so the cookie is first-party
 only. The name is deliberately not `__Host-`-prefixed: that prefix demands `Secure`, which
 local HTTP cannot set.
 
-**Set `ZEUS_COOKIE_SECURE=1` in production.** The boot banner states which mode is active.
+**Set `ARES_COOKIE_SECURE=1` in production.** The boot banner states which mode is active.
 
 ### 17. Debug mode off
 
@@ -301,27 +301,27 @@ append-only triggers, whether the session cookie is `Secure`, the upload retenti
 the renewal notice window, the relay target, the spool path, whether this listener speaks
 TLS, and then one `[!]` line per configuration finding — the readiness warnings from
 `server/prodcheck.ts` and the generated-secret notices. A deployment that lost
-`ZEUS_SESSION_KEY` still works, and the operator is
+`ARES_SESSION_KEY` still works, and the operator is
 told that everyone will be signed out on restart.
 
 **Enforced at boot.** `server/prodcheck.ts` `productionReadiness()` is a pure function of
 the environment plus two facts the caller already has — whether the cookie carries `Secure`
 and whether the listener speaks TLS — and `server/index.ts` exits **3 before binding the
 socket** when it reports a fatal finding. Production is claimed by `NODE_ENV=production`
-**or** `ZEUS_ENV=production`, so a platform that rewrites `NODE_ENV` cannot silently demote
+**or** `ARES_ENV=production`, so a platform that rewrites `NODE_ENV` cannot silently demote
 a deployment to development and switch the checks off.
 
 Fatal, meaning the process refuses to start:
 
 - the session cookie's `Secure` flag is off;
-- `ZEUS_SESSION_KEY` or `ZEUS_MASTER_KEY` is unset or is not 64 hex characters — a generated
+- `ARES_SESSION_KEY` or `ARES_MASTER_KEY` is unset or is not 64 hex characters — a generated
   key is printed into the boot banner, where a supervisor's log keeps it;
-- `ZEUS_OPERATOR_TOKEN` is unset or shorter than 32 characters;
-- a permitted origin in `ZEUS_CONSOLE_ORIGINS` is plaintext and is not loopback;
-- `ZEUS_BOOTSTRAP_ADMIN_PASSWORD` is set and shorter than the 12-character policy floor.
+- `ARES_OPERATOR_TOKEN` is unset or shorter than 32 characters;
+- a permitted origin in `ARES_CONSOLE_ORIGINS` is plaintext and is not loopback;
+- `ARES_BOOTSTRAP_ADMIN_PASSWORD` is set and shorter than the 12-character policy floor.
 
 Warnings, meaning the risk is real but depends on topology the process cannot see, so it
-starts and prints them as `[!]` lines: no TLS material on this listener; `ZEUS_TRUST_PROXY`
+starts and prints them as `[!]` lines: no TLS material on this listener; `ARES_TRUST_PROXY`
 is not `1`, so behind a proxy every client collapses into one rate-limit bucket and the
 audit trail records the proxy as the source; no bootstrap administrator password, so the
 console has no authorised reader; and every permitted origin being plaintext. A production deployment reads its secrets from
@@ -389,7 +389,7 @@ would reach it, so treat the console origin as privileged.
 
 ### 23. Server-side secrets
 
-`ZEUS_MASTER_KEY`, `ZEUS_OPERATOR_TOKEN`, `ZEUS_SESSION_KEY`, `ZEUS_BOOTSTRAP_ADMIN_PASSWORD`
+`ARES_MASTER_KEY`, `ARES_OPERATOR_TOKEN`, `ARES_SESSION_KEY`, `ARES_BOOTSTRAP_ADMIN_PASSWORD`
 and `RESEND_API_KEY` are read from the environment in `server/bootstrap.ts`,
 `server/index.ts` and `server/mailer.ts`, and are compared and used only on the server. Their values live in Infisical, not in the
 repository: locally `infisical run --env=dev` injects them, and a deployment authenticates a
@@ -397,7 +397,7 @@ machine identity with Universal Auth and takes the client ID and client secret f
 platform's own secret store. A credential is never written into a file that travels with
 the code.
 
-Because `ZEUS_SESSION_KEY` is domain-separated (`digest()` in `server/auth.ts`), the same
+Because `ARES_SESSION_KEY` is domain-separated (`digest()` in `server/auth.ts`), the same
 key derives the session digest, the CSRF digest and the address digest without collision —
 and callers that only need to key something on an address get `ipDigest()`, not the key.
 
@@ -413,12 +413,12 @@ holds the local project link only — no secrets — and is intentionally commit
 No code path logs a request body, an address, a token or a digest of a password.
 `server/index.ts` prints the operator token only when it was **generated** for that process
 (the case where the operator has no other way to obtain it) and prints
-`from environment (ZEUS_OPERATOR_TOKEN)` when it came from configuration. `server/mailer.ts`
+`from environment (ARES_OPERATOR_TOKEN)` when it came from configuration. `server/mailer.ts`
 exposes `maskAddress()`, which keeps enough of an address to recognise one you already know
 and not enough to harvest one. The audit trail stores `ip_hash`, never the address.
 
 Residual: the boot banner in a log file is a disclosure surface for a generated operator
-token. Do not retain or share that log, and set `ZEUS_OPERATOR_TOKEN` in any deployment
+token. Do not retain or share that log, and set `ARES_OPERATOR_TOKEN` in any deployment
 whose stdout is collected.
 
 ### 26. Parameterised SQL
@@ -525,26 +525,26 @@ Names come from `.env.example`. Each was confirmed against the code that reads i
 
 | Variable | Purpose | If unset |
 | --- | --- | --- |
-| `ZEUS_MASTER_KEY` | 64 hex chars. Derives per-agent telemetry MACs, so the enrolled fleet is stable across restarts. | A fresh key is generated per boot and a `[!]` notice is printed; previously issued agent keys stop verifying. |
-| `ZEUS_OPERATOR_TOKEN` | Console control-plane credential, minimum 32 characters. | A 24-byte random token is generated and printed in the boot banner. |
-| `ZEUS_CONSOLE_ORIGINS` | Comma-separated exact-match list of browser origins allowed to call the API. | Falls back to the four loopback development origins in `server/index.ts`. |
-| `ZEUS_TRUST_PROXY` | `1` makes the rightmost `x-forwarded-for` entry authoritative for rate-limit bucketing. | Buckets are charged on the socket address. Set this **only** behind a proxy you control. |
-| `ZEUS_SIGNUP_PER_MIN` | Raises the process-wide signup ceiling (default 6/min, burst 3), for a launch or an automated suite. Bounded, and the per-source signup gate is deliberately not adjustable. | The built-in default. |
-| `ZEUS_SESSION_KEY` | 64 hex chars. Signing key for session, CSRF and address digests. | A fresh key per process; every session is invalidated on restart, and a notice is printed. |
-| `ZEUS_DB` | SQLite file for accounts, sessions, consents, subscriptions, uploads and the audit log. | `.zeus-data/zeus.db`. |
-| `ZEUS_UPLOAD_DIR` | Directory the stored artefacts are written to, created mode `0700`, write mode `0600`. | `.zeus-data/uploads`. |
-| `ZEUS_BOOTSTRAP_ADMIN_EMAIL` | Address for the first administrator, created only when no `ADMIN` row exists. | No administrator is created; the boot line says so. |
-| `ZEUS_BOOTSTRAP_ADMIN_PASSWORD` | Password for that first administrator; must pass the policy. | Same as above. |
-| `ZEUS_COOKIE_SECURE` | `1` adds `Secure` to the session cookie. | `0`: the cookie is sent over plain HTTP. **Must be `1` in production.** |
-| `ZEUS_TLS_CERT` | PEM certificate path. With `ZEUS_TLS_KEY` set, this listener speaks HTTPS directly. | Plain HTTP. Setting one without the other, or naming an unreadable file, refuses to start (exit 3). |
-| `ZEUS_TLS_KEY` | PEM private key path. | As above. |
+| `ARES_MASTER_KEY` | 64 hex chars. Derives per-agent telemetry MACs, so the enrolled fleet is stable across restarts. | A fresh key is generated per boot and a `[!]` notice is printed; previously issued agent keys stop verifying. |
+| `ARES_OPERATOR_TOKEN` | Console control-plane credential, minimum 32 characters. | A 24-byte random token is generated and printed in the boot banner. |
+| `ARES_CONSOLE_ORIGINS` | Comma-separated exact-match list of browser origins allowed to call the API. | Falls back to the four loopback development origins in `server/index.ts`. |
+| `ARES_TRUST_PROXY` | `1` makes the rightmost `x-forwarded-for` entry authoritative for rate-limit bucketing. | Buckets are charged on the socket address. Set this **only** behind a proxy you control. |
+| `ARES_SIGNUP_PER_MIN` | Raises the process-wide signup ceiling (default 6/min, burst 3), for a launch or an automated suite. Bounded, and the per-source signup gate is deliberately not adjustable. | The built-in default. |
+| `ARES_SESSION_KEY` | 64 hex chars. Signing key for session, CSRF and address digests. | A fresh key per process; every session is invalidated on restart, and a notice is printed. |
+| `ARES_DB` | SQLite file for accounts, sessions, consents, subscriptions, uploads and the audit log. | `.ares-data/ares.db`. |
+| `ARES_UPLOAD_DIR` | Directory the stored artefacts are written to, created mode `0700`, write mode `0600`. | `.ares-data/uploads`. |
+| `ARES_BOOTSTRAP_ADMIN_EMAIL` | Address for the first administrator, created only when no `ADMIN` row exists. | No administrator is created; the boot line says so. |
+| `ARES_BOOTSTRAP_ADMIN_PASSWORD` | Password for that first administrator; must pass the policy. | Same as above. |
+| `ARES_COOKIE_SECURE` | `1` adds `Secure` to the session cookie. | `0`: the cookie is sent over plain HTTP. **Must be `1` in production.** |
+| `ARES_TLS_CERT` | PEM certificate path. With `ARES_TLS_KEY` set, this listener speaks HTTPS directly. | Plain HTTP. Setting one without the other, or naming an unreadable file, refuses to start (exit 3). |
+| `ARES_TLS_KEY` | PEM private key path. | As above. |
 | `RESEND_API_KEY` | Mail relay credential. | Mail is appended to the spool and reported `SPOOLED`. A request is never lost for want of a credential. |
-| `ZEUS_REQUEST_TO` | Recipient of build requests. Fixed here, never in the payload. | `cagelove094@gmail.com` (`server/mailer.ts` `DEFAULT_RECIPIENT`). |
-| `ZEUS_REQUEST_FROM` | Sender header for relayed mail. | `ZEUS Arbiter <onboarding@resend.dev>`. |
-| `ZEUS_REQUEST_ENDPOINT` | Relay endpoint. | `https://api.resend.com/emails`. |
-| `ZEUS_REQUEST_SPOOL` | Spool file for mail that could not be relayed. | `.zeus-requests.log` in the working directory, written mode `0600`. |
-| `ZEUS_UPLOAD_RETENTION_DAYS` | Days an uploaded artefact is kept before the sweeper deletes it. Clamped to 1–365. | `30`. **Also the figure the privacy policy states** (`src/pages/Privacy.tsx`), so changing it means changing the policy copy. |
-| `ZEUS_RENEWAL_NOTICE_DAYS` | Days before a renewal that the one-per-period notice is sent. Clamped to 1–90. | `14`. |
+| `ARES_REQUEST_TO` | Recipient of build requests. Fixed here, never in the payload. | `cagelove094@gmail.com` (`server/mailer.ts` `DEFAULT_RECIPIENT`). |
+| `ARES_REQUEST_FROM` | Sender header for relayed mail. | `ARES Arbiter <onboarding@resend.dev>`. |
+| `ARES_REQUEST_ENDPOINT` | Relay endpoint. | `https://api.resend.com/emails`. |
+| `ARES_REQUEST_SPOOL` | Spool file for mail that could not be relayed. | `.ares-requests.log` in the working directory, written mode `0600`. |
+| `ARES_UPLOAD_RETENTION_DAYS` | Days an uploaded artefact is kept before the sweeper deletes it. Clamped to 1–365. | `30`. **Also the figure the privacy policy states** (`src/pages/Privacy.tsx`), so changing it means changing the policy copy. |
+| `ARES_RENEWAL_NOTICE_DAYS` | Days before a renewal that the one-per-period notice is sent. Clamped to 1–90. | `14`. |
 | `PORT` | Listen port. | `8787`. |
 | `NODE_ENV` | `production` arms the readiness checks in `server/prodcheck.ts` so an insecure configuration stops the process instead of warning. Gates no code path. | Treated as development: the checks warn and the process starts. The template ships `development`. |
 
@@ -552,21 +552,21 @@ Read by the code but absent from the template — add them to `.env.example` if 
 
 | Variable | Read in | Default |
 | --- | --- | --- |
-| `ZEUS_ENV` | `server/prodcheck.ts` | Unset. `production` here has the same effect as `NODE_ENV=production`. |
-| `ZEUS_SESSIONS` | `server/index.ts`, `server/bootstrap.ts` | `6` |
-| `ZEUS_TPS` | `server/index.ts`, `server/bootstrap.ts` | `60` via `index.ts`, `0` via `bootstrap()` |
-| `ZEUS_SEED` | `server/index.ts`, `server/bootstrap.ts` | `0x5eed` |
+| `ARES_ENV` | `server/prodcheck.ts` | Unset. `production` here has the same effect as `NODE_ENV=production`. |
+| `ARES_SESSIONS` | `server/index.ts`, `server/bootstrap.ts` | `6` |
+| `ARES_TPS` | `server/index.ts`, `server/bootstrap.ts` | `60` via `index.ts`, `0` via `bootstrap()` |
+| `ARES_SEED` | `server/index.ts`, `server/bootstrap.ts` | `0x5eed` |
 
-**Must be set in production:** `NODE_ENV=production` (or `ZEUS_ENV=production`) to arm the
-refusal, `ZEUS_MASTER_KEY`, `ZEUS_SESSION_KEY`, `ZEUS_OPERATOR_TOKEN`,
-`ZEUS_COOKIE_SECURE=1`, `ZEUS_CONSOLE_ORIGINS`, `RESEND_API_KEY`, and `ZEUS_TRUST_PROXY`
+**Must be set in production:** `NODE_ENV=production` (or `ARES_ENV=production`) to arm the
+refusal, `ARES_MASTER_KEY`, `ARES_SESSION_KEY`, `ARES_OPERATOR_TOKEN`,
+`ARES_COOKIE_SECURE=1`, `ARES_CONSOLE_ORIGINS`, `RESEND_API_KEY`, and `ARES_TRUST_PROXY`
 decided explicitly. Four of those are enforced rather than advised: once production is
 claimed, a missing master key, session key or operator token, or a session cookie without
-`Secure`, stops the process before it binds its socket. A `ZEUS_BOOTSTRAP_ADMIN_PASSWORD`
+`Secure`, stops the process before it binds its socket. A `ARES_BOOTSTRAP_ADMIN_PASSWORD`
 that is set must also clear the 12-character floor.
 
-**Generated in development, with a `[!]` notice at boot:** `ZEUS_MASTER_KEY`,
-`ZEUS_SESSION_KEY`, `ZEUS_OPERATOR_TOKEN`. The first two make state not survive a restart;
+**Generated in development, with a `[!]` notice at boot:** `ARES_MASTER_KEY`,
+`ARES_SESSION_KEY`, `ARES_OPERATOR_TOKEN`. The first two make state not survive a restart;
 the third is printed for the operator to use.
 
 ---
@@ -576,36 +576,36 @@ the third is printed for the operator to use.
 1. **Decide where TLS terminates.** The process binds `127.0.0.1`, so the usual shape is a
    proxy in front of it — nginx, Caddy or a cloud load balancer — with the process port
    never exposed. A single-host deployment can instead terminate TLS here by setting
-   `ZEUS_TLS_CERT` and `ZEUS_TLS_KEY`; the boot banner's `transport` line says which
+   `ARES_TLS_CERT` and `ARES_TLS_KEY`; the boot banner's `transport` line says which
    listener is running, and an incomplete pair refuses to start.
-2. **Set `ZEUS_COOKIE_SECURE=1`** so the session cookie carries `Secure`. Confirm the boot
+2. **Set `ARES_COOKIE_SECURE=1`** so the session cookie carries `Secure`. Confirm the boot
    banner reads `cookie Secure=ON`.
-3. **Decide `ZEUS_TRUST_PROXY` deliberately.** Set `1` only when a proxy you control is
+3. **Decide `ARES_TRUST_PROXY` deliberately.** Set `1` only when a proxy you control is
    directly in front of the process; then the rightmost `x-forwarded-for` entry is
    authoritative for rate limiting. Leave `0` when the process is directly reachable, or a
    caller can choose its own bucket key.
-4. **Set `ZEUS_CONSOLE_ORIGINS` to the exact production origins.** No wildcard, no
+4. **Set `ARES_CONSOLE_ORIGINS` to the exact production origins.** No wildcard, no
    trailing slash, no scheme mismatch. Remember that no CORS header is ever emitted: a
    browser client must be same-origin with the arbiter or served from an allowed origin that
    loads the console from the same origin it calls.
 5. **Serve the console from the same origin** with `--serve-static=dist`, or place it
    behind the same proxy on an origin that is on the list.
-6. **Set fixed secrets** for `ZEUS_MASTER_KEY` and `ZEUS_SESSION_KEY` (64 hex characters
-   each) so sessions and agent keys survive a restart, and set `ZEUS_OPERATOR_TOKEN` so it
+6. **Set fixed secrets** for `ARES_MASTER_KEY` and `ARES_SESSION_KEY` (64 hex characters
+   each) so sessions and agent keys survive a restart, and set `ARES_OPERATOR_TOKEN` so it
    is not printed into a log.
-7. **Create the first administrator once.** Set `ZEUS_BOOTSTRAP_ADMIN_EMAIL` and
-   `ZEUS_BOOTSTRAP_ADMIN_PASSWORD`, start the process, sign in, change the password — the
+7. **Create the first administrator once.** Set `ARES_BOOTSTRAP_ADMIN_EMAIL` and
+   `ARES_BOOTSTRAP_ADMIN_PASSWORD`, start the process, sign in, change the password — the
    account is refused every privileged route until you do — then **remove both variables
    from the environment**. Leaving them set keeps a known credential valid.
 8. **Own the data directory.** Run the process as a dedicated unprivileged account, keep
-   `ZEUS_DB` and `ZEUS_UPLOAD_DIR` outside the deployed tree and outside any asset root,
+   `ARES_DB` and `ARES_UPLOAD_DIR` outside the deployed tree and outside any asset root,
    confirm the database file is `0600` and owned by that account, and back it up by copying
    the database **and** its `-wal`/`-shm` sidecars while the process is stopped, or with
    `sqlite3 .backup`.
-9. **Set the retention window and match the policy.** `ZEUS_UPLOAD_RETENTION_DAYS` must
+9. **Set the retention window and match the policy.** `ARES_UPLOAD_RETENTION_DAYS` must
    equal the number `src/pages/Privacy.tsx` states (30 by default). The sweeper runs every
    60 seconds from `Runtime.housekeep()`.
-10. **Set `ZEUS_RENEWAL_NOTICE_DAYS`** to the window in which the once-per-period renewal
+10. **Set `ARES_RENEWAL_NOTICE_DAYS`** to the window in which the once-per-period renewal
     email is sent (14 by default). Every auto-renewing subscription is warned exactly once
     per period, inside this window, and the notice tells the reader how to stop it.
 11. **Configure the mail relay** with `RESEND_API_KEY`; verify the spool is empty after a
@@ -619,7 +619,7 @@ the third is printed for the operator to use.
     warnings and the bootstrap notices share that marker — and the lines that must read as
     expected are the schema version, the foreign-key and append-only-trigger counts, the
     cookie mode, and the `transport` line.
-15. **Claim production explicitly.** Set `NODE_ENV=production` (or `ZEUS_ENV=production`)
+15. **Claim production explicitly.** Set `NODE_ENV=production` (or `ARES_ENV=production`)
     so the readiness checks refuse rather than warn, and confirm the process got past them:
     it exits 3 before binding if it did not. A deployment that never claims production is a
     deployment whose insecure configuration is only ever a warning.
@@ -700,7 +700,7 @@ Also enforced: the declared type must match the detected content (a mismatch is 
 and unidentified non-text bytes are refused rather than stored on a guess — the UTF-8
 decode is strict, so a lone continuation byte is not "text".
 
-**Placement.** Bytes are written under `ZEUS_UPLOAD_DIR` (default `.zeus-data/uploads`),
+**Placement.** Bytes are written under `ARES_UPLOAD_DIR` (default `.ares-data/uploads`),
 created mode `0700`, written mode `0600` with the exclusive flag, under a random 32-hex name
 with **no extension**. The original name influences nothing on disk. Nothing serves these
 bytes back: there is no read route, and the absence of one is the control.
@@ -754,12 +754,12 @@ query. Postgres can enforce the same rule one layer lower, and should:
 
 ```sql
 -- The application connects as this role. It cannot bypass policies and does not own the tables.
-CREATE ROLE zeus_app LOGIN PASSWORD '...' NOBYPASSRLS NOSUPERUSER;
+CREATE ROLE ares_app LOGIN PASSWORD '...' NOBYPASSRLS NOSUPERUSER;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON users, sessions, consents, subscriptions, uploads
-  TO zeus_app;
+  TO ares_app;
 -- The audit log is append-only: INSERT and SELECT only, and no UPDATE or DELETE grant.
-GRANT SELECT, INSERT ON audit_log TO zeus_app;
+GRANT SELECT, INSERT ON audit_log TO ares_app;
 
 ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE uploads       ENABLE ROW LEVEL SECURITY;
@@ -829,7 +829,7 @@ These are user-facing commitments that constrain the engineering. The policy pag
 move together.
 
 1. **Uploads are deleted after the retention window.** The window is
-   `ZEUS_UPLOAD_RETENTION_DAYS` (30 by default), the policy page states the same number, the
+   `ARES_UPLOAD_RETENTION_DAYS` (30 by default), the policy page states the same number, the
    sweeper deletes the bytes and marks the row, and each deletion is audited.
 2. **Cancelling never takes longer than signing up.** Signing up needs four fields and two
    consent decisions; cancelling needs one identifier and one confirmation
@@ -838,7 +838,7 @@ move together.
    separately asserts that cancelling switches off auto-renew, keeps the paid period, and
    leaves `service continues to <date>` in the audit record.
 3. **Every auto-renewal is preceded by an email.** `Subscriptions.sendDueReminders()`
-   sends once per period inside `ZEUS_RENEWAL_NOTICE_DAYS` of the period end, and the
+   sends once per period inside `ARES_RENEWAL_NOTICE_DAYS` of the period end, and the
    `reminder_sent_for` column is what makes it once per period rather than once ever. The
    notice is plain text, states the plan, the date and the amount, and says how to stop it
    in one action. `tests/security.test.ts` asserts the once-per-period property and the text.
@@ -875,5 +875,5 @@ Two further residual risks that are not gaps so much as properties to be aware o
 - **The operator token lives in memory for the life of the console page**
   (`src/lib/api.ts`) and is written to no browser storage. Treat the console origin as
   privileged anyway.
-- **The boot banner can print a generated operator token.** Set `ZEUS_OPERATOR_TOKEN` when
+- **The boot banner can print a generated operator token.** Set `ARES_OPERATOR_TOKEN` when
   stdout is collected anywhere.

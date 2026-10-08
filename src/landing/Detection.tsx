@@ -30,7 +30,7 @@ const CARD_SWEEP =
   "pointer-events-none absolute inset-x-0 top-0 h-24 -translate-y-full bg-gradient-to-b from-transparent via-volt/[0.07] to-transparent transition-transform duration-700 group-hover:translate-y-[400%]";
 const CARD_RULE = "absolute inset-x-0 top-0 h-[2px] w-0 bg-volt transition-all duration-500 group-hover:w-full";
 const CARD_TILE =
-  "grid h-14 w-14 place-items-center border border-line bg-panel text-volt transition-all duration-500 group-hover:border-volt/50 group-hover:shadow-[0_0_30px_rgba(87,224,255,0.25)] clip-notch";
+  "grid h-14 w-14 place-items-center border border-line bg-panel text-volt transition-all duration-500 group-hover:border-volt/50 group-hover:shadow-[0_0_30px_rgba(239,121,94,0.25)] clip-notch";
 const CARD_INDEX = "font-mono text-[11px] tracking-[0.3em] text-mist/50 transition-colors group-hover:text-volt";
 const CARD_TAG =
   "border border-line px-2.5 py-1 font-mono text-[10px] tracking-[0.16em] text-mist/80 transition-colors duration-300 group-hover:border-volt/30 group-hover:text-volt/90";

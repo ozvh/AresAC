@@ -143,7 +143,7 @@ export default function BuildRequest(): JSX.Element {
       {/* ---------- header ---------- */}
       <header className="flex h-[30px] shrink-0 items-center justify-between gap-4 border-b border-line bg-panel px-2 text-[10px] uppercase tracking-[0.18em]">
         <span className="flex items-center gap-3">
-          <span className="text-fg">ZEUS // BUILD REQUEST</span>
+          <span className="text-fg">ARES // BUILD REQUEST</span>
           <span className="text-dimmer">PUBLIC SURFACE · RATE-LIMITED · LEDGER-SEALED</span>
         </span>
         <a href="/" className="text-dim hover:text-fg">
