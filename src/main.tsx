@@ -1,3 +1,5 @@
+import "./sentry";
+import * as Sentry from "@sentry/react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
@@ -75,6 +77,8 @@ const Component = chosen.component;
 
 createRoot(root).render(
   <StrictMode>
-    <Component />
+    <Sentry.ErrorBoundary fallback={<p role="alert">Ares could not display this page. Please reload and try again.</p>}>
+      <Component />
+    </Sentry.ErrorBoundary>
   </StrictMode>,
 );

@@ -13,6 +13,7 @@
  */
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { ApiErrorCode } from "../shared/protocol.ts";
+import { SENTRY_ORIGIN } from "../shared/sentry.ts";
 
 /**
  * Error code -> HTTP status. One table, so no route can invent a status that disagrees
@@ -40,7 +41,7 @@ export const STATUS_OF: Readonly<Record<ApiErrorCode, number>> = {
  * payload inert: there is no inline script to inject into, no third-party origin to load
  * from, and no `object` or `base` to abuse. `form-action 'none'` means a form cannot
  * navigate a submission anywhere, so the only way a payload leaves this origin is through
- * the same-origin fetches the pages already make. `frame-ancestors 'none'` blocks click
+ * same-origin fetches and the explicitly allowed Sentry error collector. `frame-ancestors 'none'` blocks click
  * jacking of the console, and `Cross-Origin-Resource-Policy` stops the responses being
  * read by another origin even when they are cached.
  *
@@ -59,7 +60,7 @@ export const SECURITY_HEADERS: Readonly<Record<string, string>> = {
   "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
   "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
   "Content-Security-Policy":
-    "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'",
+    `default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' ${SENTRY_ORIGIN}; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'`,
 };
 
 export type BodyResult =

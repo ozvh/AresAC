@@ -17,9 +17,11 @@
     "load": "node --experimental-strip-types --no-warnings tools/load.ts",
     "preview": "vite preview",
     "security": "npm audit --audit-level=high",
-    "security:secrets": "node --experimental-strip-types --no-warnings tools/secrets.ts"
+    "security:secrets": "node --experimental-strip-types --no-warnings tools/secrets.ts",
+    "sentry:test": "node --experimental-strip-types --no-warnings tools/sentry-test.ts"
   },
   "dependencies": {
+    "@sentry/react": "11.5.0",
     "react": "19.2.6",
     "react-dom": "19.2.6"
   },
