@@ -88,7 +88,7 @@ function Consent({
         type="checkbox"
         checked={checked}
         onChange={(event) => onChange(event.currentTarget.checked)}
-        className="mt-[2px] h-[12px] w-[12px] shrink-0"
+        className="mt-[2px] size-[12px] shrink-0"
       />
       <label htmlFor={id} className="text-[11px] leading-relaxed text-dim">
         {children}

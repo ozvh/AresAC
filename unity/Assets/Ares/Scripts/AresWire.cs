@@ -207,7 +207,13 @@ namespace Ares.Demo
         public readonly int Counter;
         public readonly AresRing Ring;
         public readonly string Id;
-        public readonly byte[] Key;
+        private readonly byte[] _key;
+
+        /// <summary>A copy of the demo key; callers cannot mutate this agent's signing state.</summary>
+        public byte[] Key
+        {
+            get { return (byte[])_key.Clone(); }
+        }
 
         private uint _seq;
 
@@ -217,7 +223,7 @@ namespace Ares.Demo
             Counter = counter;
             Ring = ring;
             Id = AresWire.AgentId(role, counter);
-            Key = AresWire.AgentKey(Id);
+            _key = AresWire.AgentKey(Id);
         }
 
         /// <summary>Next sample for this ring, with its sequence number assigned.</summary>

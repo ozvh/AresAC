@@ -51,8 +51,7 @@ function distribution(masks: readonly number[]): Bucket[] {
 
 export default function RingTopology(): JSX.Element {
   const state = useConsole();
-  const counters = state.counters;
-  const tuning = state.tuning;
+  const { counters, tuning } = state;
 
   const counts: Record<Role, number> = {
     KMOD: counters?.ring.KMOD ?? 0,

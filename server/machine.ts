@@ -344,7 +344,7 @@ export class Arbiter {
     const cutoff = sample.ts - TUNING.windowMs;
     let droppedProof = false;
     for (;;) {
-      const head = subject.samples[0];
+      const [head] = subject.samples;
       if (head === undefined || head.ts > cutoff) break;
       if (head.structural && head.sev >= STRUCTURAL_CERTAINTY_SEV) droppedProof = true;
       this.#evictOldest(subject);
@@ -381,7 +381,7 @@ export class Arbiter {
     const cutoff = now - TUNING.windowMs;
     let lostProof = false;
     for (;;) {
-      const head = subject.samples[0];
+      const [head] = subject.samples;
       if (head === undefined || head.ts > cutoff) break;
       if (head.structural && head.sev >= STRUCTURAL_CERTAINTY_SEV) lostProof = true;
       this.#evictOldest(subject);
@@ -530,7 +530,7 @@ export class Arbiter {
         // often the sweeper happens to run.
         const decayFrom = Math.max(subject.lastDecayAt, subject.lastEvidence + TUNING.decayMs);
         const elapsed = Math.max(0, now - decayFrom);
-        const factor = Math.pow(1 - TUNING.decayPerSec, elapsed / 1000);
+        const factor = (1 - TUNING.decayPerSec) ** (elapsed / 1000);
         subject.peak *= factor;
         subject.lastDecayAt = Math.max(subject.lastDecayAt, now);
       }

@@ -40,6 +40,7 @@ import {
 import { Ledger } from "./ledger.ts";
 import { Limiter } from "./limiter.ts";
 import { Mailer, type MailMessage } from "./mailer.ts";
+import { hasForbiddenControl } from "./text-policy.ts";
 
 export type SubmitOutcome =
   | { readonly ok: true; readonly ref: string }
@@ -67,8 +68,6 @@ const EMAIL = /^[A-Za-z0-9._%+-]{1,64}@[A-Za-z0-9-]{1,63}(?:\.[A-Za-z0-9-]{1,63}
  * note is allowed to be several lines, it is not allowed to contain a byte that
  * rewrites how the message reads.
  */
-const CONTROL_STRICT = /[\u0000-\u001f\u007f]/;
-const CONTROL_MULTILINE = /[\u0000-\u0009\u000b-\u001f\u007f]/;
 const MAX_DWELL_MS = 86_400_000;
 
 const ERROR_SET: ReadonlySet<string> = new Set<string>(API_ERROR_CODES);
@@ -91,7 +90,7 @@ function text(value: unknown, field: string, max: number, multiline = false): st
   if (typeof value !== "string") return fail("SCHEMA", `${field} must be a string`);
   const trimmed = value.trim();
   if (trimmed.length > max) return fail("SCHEMA", `${field} exceeds ${max} characters`);
-  if ((multiline ? CONTROL_MULTILINE : CONTROL_STRICT).test(trimmed)) {
+  if (hasForbiddenControl(trimmed, multiline)) {
     return fail("SCHEMA", `${field} contains control characters`);
   }
   return trimmed;
@@ -142,10 +141,10 @@ export function parseBuildRequest(raw: string): ParseOutcome {
   const trap = text(parsed["hp"], "hp", 200);
   if (wasFailure(trap)) return trap;
 
-  const tgt = parsed["tgt"];
+  const { tgt } = parsed;
   if (!isBuildProfile(tgt)) return fail("SCHEMA", "tgt is not a known build channel");
 
-  const el = parsed["el"];
+  const { el } = parsed;
   if (typeof el !== "number" || !Number.isInteger(el) || el < 0 || el > MAX_DWELL_MS) {
     return fail("SCHEMA", "el is not a plausible dwell");
   }
@@ -264,7 +263,7 @@ export class RequestIntake {
       this.#stat.refused += 1;
       return { ok: false, code: parsed.code, msg: parsed.msg };
     }
-    const input = parsed.input;
+    const { input } = parsed;
     const ref = randomBytes(4).toString("hex");
 
     // Honeypot. The response is a plain refusal rather than a fabricated success: a

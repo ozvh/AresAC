@@ -84,8 +84,8 @@ export default function Footer(): JSX.Element {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_45%_at_50%_55%,rgba(239,121,94,0.08),transparent_70%)]" />
 
         <Reveal>
-          <span className="inline-grid h-16 w-16 place-items-center border border-volt/40 bg-volt/10 text-volt glow-volt clip-notch">
-            <Ic name="shield-half" strokeWidth={1.8} className="h-7 w-7" />
+          <span className="inline-grid size-16 place-items-center border border-volt/40 bg-volt/10 text-volt glow-volt clip-notch">
+            <Ic name="shield-half" strokeWidth={1.8} className="size-7" />
           </span>
         </Reveal>
 
@@ -108,7 +108,7 @@ export default function Footer(): JSX.Element {
             className="group flex items-center gap-3 bg-volt px-8 py-4 font-mono text-xs font-semibold uppercase tracking-[0.24em] text-abyss transition-all duration-300 hover:shadow-[0_0_50px_rgba(239,121,94,0.5)] clip-notch"
           >
             Request the build
-            <Ic name="arrow-up-right" className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            <Ic name="arrow-up-right" className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </a>
           <a
             href="#adjudication"
@@ -122,7 +122,7 @@ export default function Footer(): JSX.Element {
           {STEPS.map((step) => (
             <span key={step.n} className="flex items-center gap-3 font-mono text-[10px] tracking-[0.26em] text-mist">
               <span className="text-volt">{step.n}</span>
-              <Ic name={step.icon} className="h-4 w-4 text-mist/70" />
+              <Ic name={step.icon} className="size-4 text-mist/70" />
               {step.label}
             </span>
           ))}
@@ -134,8 +134,8 @@ export default function Footer(): JSX.Element {
           <div className="grid gap-12 pb-16 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
             <div>
               <div className="flex items-center gap-3">
-                <span className="grid h-9 w-9 place-items-center border border-line-2 bg-panel clip-notch">
-                  <Ic name="shield-half" strokeWidth={2.4} className="h-4 w-4 text-volt" />
+                <span className="grid size-9 place-items-center border border-line-2 bg-panel clip-notch">
+                  <Ic name="shield-half" strokeWidth={2.4} className="size-4 text-volt" />
                 </span>
                 <span className="font-display text-lg font-bold tracking-[0.22em]">ARES</span>
               </div>
@@ -150,7 +150,7 @@ export default function Footer(): JSX.Element {
           </div>
 
           <div className="pointer-events-none select-none overflow-hidden">
-            <div className="text-hollow -mb-[0.23em] text-center font-display text-[26vw] font-bold leading-none tracking-[-0.02em] opacity-40 md:text-[19rem]">
+            <div className="text-hollow mb-[-0.23em] text-center font-display text-[26vw] font-bold leading-none tracking-[-0.02em] opacity-40 md:text-[19rem]">
               ARES
             </div>
           </div>
@@ -161,7 +161,7 @@ export default function Footer(): JSX.Element {
             <span>© 2026 ARES ANTI CHEAT</span>
             <span className="text-volt">BLOCK ≠ BAN.</span>
             <a href="#top" className="flex items-center gap-2 transition-colors hover:text-white">
-              BACK TO TOP <Ic name="arrow-up" className="h-3.5 w-3.5" />
+              BACK TO TOP <Ic name="arrow-up" className="size-3.5" />
             </a>
           </div>
         </div>

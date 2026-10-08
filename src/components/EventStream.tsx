@@ -56,11 +56,10 @@ export default function EventStream(): JSX.Element {
 
   // Measure the viewport once, then keep measuring it as panels are resized.
   useLayoutEffect(() => {
-    const el = scroller.current;
+    const { current: el } = scroller;
     if (el === null) return;
     const measure = (): void => {
-      const height = el.clientHeight;
-      const top = el.scrollTop;
+      const { clientHeight: height, scrollTop: top } = el;
       setViewport((prev) => (prev.height === height && prev.top === top ? prev : { top, height }));
     };
     measure();
@@ -80,13 +79,13 @@ export default function EventStream(): JSX.Element {
    * arithmetically, so the window is set from the calculation rather than from the event.
    */
   useLayoutEffect(() => {
-    const el = scroller.current;
+    const { current: el } = scroller;
     if (el === null) return;
-    const height = el.clientHeight;
+    const { clientHeight: height } = el;
 
     if (!follow) {
       // Detached: the operator owns the position, and the scroll handler runs the window.
-      const top = el.scrollTop;
+      const { scrollTop: top } = el;
       setViewport((prev) => (prev.top === top && prev.height === height ? prev : { top, height }));
       return;
     }
@@ -109,7 +108,8 @@ export default function EventStream(): JSX.Element {
     rows.push(<EventRow key={event.q} event={event} top={i * ROW_H} />);
   }
 
-  const counters = state.counters;
+  const { counters } = state;
+  const linkReason = state.reason === "" ? "" : ` · ${state.reason}`;
 
   return (
     <section className="flex min-h-0 flex-1 flex-col bg-panel">
@@ -129,7 +129,7 @@ export default function EventStream(): JSX.Element {
             className="px-1 text-[10px] uppercase"
             onClick={() => {
               setFollow(true);
-              const el = scroller.current;
+              const { current: el } = scroller;
               if (el !== null) el.scrollTop = ring.size * ROW_H;
             }}
           >
@@ -155,11 +155,10 @@ export default function EventStream(): JSX.Element {
         ref={scroller}
         className="min-h-0 flex-1 overflow-y-scroll"
         onScroll={(event) => {
-          const el = event.currentTarget;
+          const { currentTarget: el } = event;
           const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - ROW_H;
           setFollow(atBottom);
-          const top = el.scrollTop;
-          const height = el.clientHeight;
+          const { scrollTop: top, clientHeight: height } = el;
           setViewport((prev) => (prev.top === top && prev.height === height ? prev : { top, height }));
         }}
       >
@@ -167,7 +166,7 @@ export default function EventStream(): JSX.Element {
           <p className="px-2 py-3 text-[11px] text-dimmer">
             {state.link === "LIVE"
               ? "stream attached · no adjudicated samples yet"
-              : `stream ${state.link.toLowerCase()}${state.reason === "" ? "" : ` · ${state.reason}`}`}
+              : `stream ${state.link.toLowerCase()}${linkReason}`}
           </p>
         ) : (
           <div className="relative" style={{ height: ring.size * ROW_H }}>

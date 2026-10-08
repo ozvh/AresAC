@@ -229,7 +229,7 @@ export default function Account(): JSX.Element {
         </div>
 
         {user !== null && user.mustChangePassword ? (
-          <section className="flex flex-col gap-2 border-b border-line bg-panel px-3 py-3">
+          <section className="flex flex-col gap-2 border-b border-line bg-panel p-3">
             <span className="text-[11px] uppercase tracking-[0.12em] text-pending">
               [!] THIS PASSWORD MUST BE CHANGED
             </span>
@@ -483,10 +483,12 @@ export default function Account(): JSX.Element {
                 ).then((applied) => {
                   // Cleared only when the server accepted it. Emptying the fields after a
                   // refusal would make the user retype a password the server never saw.
-                  if (!applied) return;
-                  setCurrent("");
-                  setNext("");
-                  setConfirm("");
+                  if (applied) {
+                    setCurrent("");
+                    setNext("");
+                    setConfirm("");
+                  }
+                  return applied;
                 });
               }}
             >

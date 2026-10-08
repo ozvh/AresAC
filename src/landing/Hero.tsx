@@ -12,7 +12,7 @@ export default function Hero(): JSX.Element {
         <h2 className="mt-10 max-w-xl font-display text-3xl font-medium leading-tight text-white md:text-4xl">Hold the line.<br /><span className="text-mist">Let the evidence decide.</span></h2>
         <p className="mt-6 max-w-lg text-base leading-relaxed text-mist md:text-lg">An anti-cheat architecture built around authenticated telemetry, server-side adjudication, and a traceable chain of evidence.</p>
         <div className="mt-9 flex flex-wrap gap-4">
-          <a href="/console" className="flex items-center gap-3 bg-volt px-6 py-4 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-abyss transition-colors hover:bg-bolt">Open live console <Ic name="arrow-up-right" className="h-4 w-4" /></a>
+          <a href="/console" className="flex items-center gap-3 bg-volt px-6 py-4 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-abyss transition-colors hover:bg-bolt">Open live console <Ic name="arrow-up-right" className="size-4" /></a>
           <a href="#architecture" className="border border-line-2 px-6 py-4 font-mono text-xs uppercase tracking-[0.16em] text-white transition-colors hover:border-volt">Explore the architecture</a>
         </div>
         <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.12em] text-mist">Development preview · Unity telemetry demo available</p>

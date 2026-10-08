@@ -407,7 +407,7 @@ export function decodeFrame(raw: string): ServerFrame | null {
   if (typeof parsed !== "object" || parsed === null) return null;
   const r = parsed as Record<string, unknown>;
   if (r["k"] === "E") {
-    const batch = r["batch"];
+    const { batch } = r;
     if (!Array.isArray(batch)) return null;
     const clean: PublicEvent[] = [];
     for (const item of batch) {
@@ -416,8 +416,7 @@ export function decodeFrame(raw: string): ServerFrame | null {
     return { k: "E", batch: clean };
   }
   if (r["k"] === "S") {
-    const subjRaw = r["subj"];
-    const ctr = r["ctr"];
+    const { subj: subjRaw, ctr } = r;
     if (!Array.isArray(subjRaw) || typeof ctr !== "object" || ctr === null) return null;
     const subj: PublicSubject[] = [];
     for (const item of subjRaw) {

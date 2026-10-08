@@ -110,7 +110,7 @@ function authorise(
   options: { readonly role: Role | null; readonly mutation: boolean },
 ): { readonly identity: Identity; readonly ipHash: string } | null {
   const { req, res, config } = request;
-  const runtime = config.runtime;
+  const { runtime } = config;
   const ipHash = runtime.auth.ipDigest(sourceOf(req));
 
   const rawCookie = parseCookies(header(req, "cookie")).get(SESSION_COOKIE) ?? null;
@@ -189,7 +189,7 @@ function publicUser(identity: Identity): Record<string, unknown> {
 
 async function signup(request: AccountRequest): Promise<boolean> {
   const { req, res, config } = request;
-  const runtime = config.runtime;
+  const { runtime } = config;
   const source = sourceOf(req);
   const now = Date.now();
 
@@ -235,7 +235,7 @@ async function signup(request: AccountRequest): Promise<boolean> {
 
 async function login(request: AccountRequest): Promise<boolean> {
   const { req, res, config } = request;
-  const runtime = config.runtime;
+  const { runtime } = config;
   const source = sourceOf(req);
 
   if (!rate(runtime, `auth:${source}`, Date.now(), AUTH_PER_MIN, AUTH_BURST)) {
@@ -295,7 +295,7 @@ function me(request: AccountRequest): boolean {
   if (authorised === null) return true;
   const { identity } = authorised;
   const { runtime } = request.config;
-  const store = runtime.store;
+  const { store } = runtime;
 
   // The token is derived from the cookie rather than stored, so handing it out on a read
   // costs nothing and invalidates nothing: the same session gets the same value every
@@ -521,7 +521,7 @@ function adminRead(request: AccountRequest): boolean {
   const authorised = authorise(request, { role: "ADMIN", mutation: false });
   if (authorised === null) return true;
   const { runtime } = request.config;
-  const store = runtime.store;
+  const { store } = runtime;
 
   if (request.pathname === "/v1/admin/summary") {
     json(request.res, 200, {
@@ -584,7 +584,7 @@ async function adminMutation(request: AccountRequest): Promise<boolean> {
     return true;
   }
 
-  const store = runtime.store;
+  const { store } = runtime;
   const now = Date.now();
   const target = store.userById(parsed.input.userId);
   if (target === null) {

@@ -193,7 +193,7 @@ export class Runtime {
   counters(now: number): PublicCounters {
     const stats = this.arbiter.stats();
     const window = this.#tpsSamples;
-    const oldest = window[0];
+    const [oldest] = window;
     const tps = oldest === undefined ? 0 : Math.max(0, Math.round(((stats.rx - oldest.rx) * 1000) / Math.max(1, now - oldest.t)));
     return {
       rx: stats.rx,
@@ -239,11 +239,11 @@ export class Runtime {
     this.limiter.prune(now);
     this.requests.prune(now);
 
-    const rx = this.arbiter.stats().rx;
+    const { rx } = this.arbiter.stats();
     this.#tpsSamples.push({ t: now, rx });
     const cutoff = now - LIMITS.windowMs;
     while (this.#tpsSamples.length > 0) {
-      const head = this.#tpsSamples[0];
+      const [head] = this.#tpsSamples;
       if (head === undefined || head.t >= cutoff) break;
       this.#tpsSamples.shift();
     }

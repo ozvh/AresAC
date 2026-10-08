@@ -51,14 +51,7 @@ function readEvent(value: unknown, index: number): IngestEvent | ParseFailure {
   }
   if (keys.length !== new Set(keys).size) return fail("SCHEMA", `event[${index}] duplicate keys`);
 
-  const v = value["v"];
-  const a = value["a"];
-  const k = value["k"];
-  const s = value["s"];
-  const t = value["t"];
-  const r = value["r"];
-  const c = value["c"];
-  const m = value["m"];
+  const { v, a, k, s, t, r, c, m } = value;
 
   if (v !== PROTOCOL_VERSION) return fail("SCHEMA", `event[${index}] protocol ${String(v)}`);
   if (typeof a !== "string" || !HEX16.test(a)) return fail("SCHEMA", `event[${index}] bad agent id`);

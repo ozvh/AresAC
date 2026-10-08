@@ -46,15 +46,9 @@ const RENEWAL_NOTICE_DAYS = 14;
  * the string keeps the attribute a single identifier, which is easier to read and removes a
  * class of syntax error entirely.
  */
-const UPLOAD_RETENTION_TEXT =
-  "Deleted automatically " +
-  String(UPLOAD_RETENTION_DAYS) +
-  " days after upload by a retention sweep that removes the file first and then marks the record. After that the bytes are gone from this deployment. Refused uploads are recorded but never written to disk.";
+const UPLOAD_RETENTION_TEXT = `Deleted automatically ${UPLOAD_RETENTION_DAYS} days after upload by a retention sweep that removes the file first and then marks the record. After that the bytes are gone from this deployment. Refused uploads are recorded but never written to disk.`;
 
-const RENEWAL_NOTICE_TEXT =
-  "A notice is emailed " +
-  String(RENEWAL_NOTICE_DAYS) +
-  " days before every renewal date, once per period, to the address on the account. It states the plan, the date, the amount, and how to stop it. The once-per-period guarantee is stored as the period that was warned about, not as a flag, so a notice cannot be sent twice for one renewal or skipped for the next.";
+const RENEWAL_NOTICE_TEXT = `A notice is emailed ${RENEWAL_NOTICE_DAYS} days before every renewal date, once per period, to the address on the account. It states the plan, the date, the amount, and how to stop it. The once-per-period guarantee is stored as the period that was warned about, not as a flag, so a notice cannot be sent twice for one renewal or skipped for the next.`;
 
 const PLAN_LIST_TEXT = Object.keys(PLAN_LABEL).join(" · ");
 

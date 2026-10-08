@@ -141,6 +141,7 @@ function main(): void {
 
     const invariants = system.store.invariants();
     const chain = system.ledger.status();
+    const chainState = chain.broken ? `BROKEN at ${String(chain.brokenAt)}` : "verified";
     const line = "─".repeat(68);
 
     // Asynchronous because it hashes a password, and it must not block the listen path.
@@ -148,6 +149,7 @@ function main(): void {
     // diagnostic, and it is the only place the bootstrap account's existence is announced.
     void auth.ensureBootstrapAdmin(process.env).then((outcome) => {
       process.stdout.write(` administrator  ${outcome}\n`);
+      return outcome;
     });
 
     process.stdout.write(
@@ -169,7 +171,7 @@ function main(): void {
         line,
         ` accounts      sqlite schema v${invariants.schemaVersion}  foreign_keys=${invariants.foreignKeys ? "ON" : "OFF"}`,
         ` stores        append-only triggers=${invariants.appendOnlyTriggers}/4  audit records=${system.store.countAudit()}`,
-        ` ledger        ${chain.length} sealed, chain ${chain.broken ? `BROKEN at ${String(chain.brokenAt)}` : "verified"}`,
+        ` ledger        ${chain.length} sealed, chain ${chainState}`,
         ` sessions      ${auth.cookieSecure ? "cookie Secure=ON" : "cookie Secure=OFF (fine on loopback, never in production)"}`,
         ` uploads       retention ${uploads.retentionDays} days`,
         ` renewals      notice ${subs.noticeDays} days before each period end`,

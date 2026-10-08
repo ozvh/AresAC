@@ -144,6 +144,7 @@ export async function runDemoTimeline(
     while (Date.now() < until) {
       const next = (seq.get(phase.role) ?? 0) + 1;
       seq.set(phase.role, next);
+      // eslint-disable-next-line no-await-in-loop -- Per-principal telemetry and phase delays must preserve sequence and timeline order.
       const result = await postDemoEvent(baseUrl, agent, {
         subject: options.subject,
         code: phase.code,
@@ -152,7 +153,8 @@ export async function runDemoTimeline(
       });
       if (result.status === 202) accepted += 1;
       else refused += 1;
-      await new Promise((resolve) => setTimeout(resolve, interval));
+      // eslint-disable-next-line no-await-in-loop -- Per-principal telemetry and phase delays must preserve sequence and timeline order.
+      await new Promise((resolve) => { setTimeout(resolve, interval); });
     }
   }
   log(`  accepted ${accepted}, refused ${refused}`);
@@ -208,22 +210,24 @@ async function main(): Promise<void> {
   });
 
   server.on("error", (error: NodeJS.ErrnoException) => {
-    process.stderr.write(`[unity-demo] ${error.code === "EADDRINUSE" ? `port ${port} is already bound` : error.message}\n`);
+    const message = error.code === "EADDRINUSE" ? `port ${port} is already bound` : error.message;
+    process.stderr.write(`[unity-demo] ${message}\n`);
     process.exit(2);
   });
 
-  await new Promise<void>((resolve) => server.listen(port, "127.0.0.1", resolve));
+  await new Promise<void>((resolve) => { server.listen(port, "127.0.0.1", resolve); });
   system.runtime.start();
 
   const line = "-".repeat(72);
   const subject = demoSubject("unity-demo-player");
+  const consoleAddress = staticDir === null ? '(none — run "npm run build" for the operator console)' : `http://127.0.0.1:${port}/console`;
   process.stdout.write(
     [
       line,
       " ARES Unity demo — the real arbiter, three demo agents, no synthetic fleet",
       line,
       ` arbiter       http://127.0.0.1:${port}/v1/ingest`,
-      ` console       ${staticDir === null ? `(none — run "npm run build" for the operator console)` : `http://127.0.0.1:${port}/console`}`,
+      ` console       ${consoleAddress}`,
       ` subject       ${subject}`,
       "",
       " demo agents (derived, never transferred):",

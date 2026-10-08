@@ -197,6 +197,7 @@ export class Mailer {
 
     for (let attempt = 1; attempt <= 2; attempt += 1) {
       try {
+        // eslint-disable-next-line no-await-in-loop -- Retry attempts, response draining, and backoff must finish in order to avoid duplicate mail.
         const res = await fetch(this.#endpoint, {
           method: "POST",
           headers: {
@@ -213,6 +214,7 @@ export class Mailer {
             // Drain the response so the connection is not left half-read. The body
             // itself is discarded: it is provider output, and nothing in it is a fact
             // this system is willing to record.
+            // eslint-disable-next-line no-await-in-loop -- Retry attempts, response draining, and backoff must finish in order to avoid duplicate mail.
             await res.text();
           } catch {
             // A failed drain does not change the verdict.
@@ -226,6 +228,7 @@ export class Mailer {
         detail = "relay unreachable";
       }
 
+      // eslint-disable-next-line no-await-in-loop -- Retry attempts, response draining, and backoff must finish in order to avoid duplicate mail.
       if (attempt === 1) await delay(400);
     }
 

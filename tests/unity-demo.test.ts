@@ -1,8 +1,8 @@
 /**
  * Unity demo suite.
  *
- * The demo ships a C# client that cannot be compiled here (no Unity editor, no .NET SDK), so
- * these tests pin the half that can be checked from this side: that the recipe the C# client
+ * The demo ships a C# client; unity-wire.test.ts compiles its independent wire implementation
+ * when a Windows C# compiler is available. These tests pin the server side: that the recipe the C# client
  * implements is byte-for-byte the one the arbiter enforces, and that a client using nothing but
  * that recipe drives the real HTTP ingest path to an accepted batch, a refused forgery, and a
  * conviction.

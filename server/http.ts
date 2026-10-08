@@ -87,23 +87,23 @@ function parseControl(raw: string): ControlAction | null {
   }
   if (typeof parsed !== "object" || parsed === null) return null;
   const r = parsed as Record<string, unknown>;
-  const op = r["op"];
+  const { op } = r;
   if (op === "PAUSE") return { op: "PAUSE" };
   if (op === "RESUME") return { op: "RESUME" };
   if (op === "RATE") {
-    const tps = r["tps"];
+    const { tps } = r;
     if (typeof tps !== "number" || !Number.isFinite(tps) || tps < 0 || tps > 200_000) return null;
     return { op: "RATE", tps: Math.floor(tps) };
   }
   if (op === "SCENARIO") {
-    const name = r["name"];
+    const { name } = r;
     if (typeof name !== "string") return null;
     const known = SCENARIOS.find((candidate) => candidate === name);
     if (known === undefined) return null;
     return { op: "SCENARIO", name: known };
   }
   if (op === "RELEASE" || op === "FLAG") {
-    const su = r["su"];
+    const { su } = r;
     if (typeof su !== "string" || !HEX12.test(su)) return null;
     return op === "RELEASE" ? { op: "RELEASE", su } : { op: "FLAG", su };
   }
@@ -128,7 +128,7 @@ export function createArbiterServer(config: TransportConfig): NetServer {
 async function handle(req: IncomingMessage, res: ServerResponse, config: TransportConfig): Promise<void> {
   const { runtime } = config;
   const url = new URL(req.url ?? "/", "http://127.0.0.1");
-  const pathname = url.pathname;
+  const { pathname } = url;
   const method = req.method ?? "GET";
 
   /* ---------------- ingest ---------------- */
@@ -164,8 +164,8 @@ async function handle(req: IncomingMessage, res: ServerResponse, config: Transpo
       return fail(res, 400, parsed.code, parsed.msg);
     }
 
-    const events = parsed.events;
-    const first = events[0];
+    const { events } = parsed;
+    const [first] = events;
     if (first === undefined) return fail(res, 400, "SCHEMA", "empty batch");
 
     // One batch, one principal. A batch spanning agents cannot be covered by a

@@ -96,7 +96,7 @@ export default function Detection(): JSX.Element {
             <div className="relative">
               <div className="flex items-start justify-between">
                 <span className={CARD_TILE}>
-                  <Ic name={pillar.glyph} strokeWidth={1.6} className="h-6 w-6" />
+                  <Ic name={pillar.glyph} strokeWidth={1.6} className="size-6" />
                 </span>
                 <span className={CARD_INDEX}>{pillar.index}</span>
               </div>

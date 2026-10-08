@@ -420,9 +420,7 @@ export default function Admin(): JSX.Element {
                   className="self-start text-[10px] uppercase"
                   disabled={busy !== ""}
                   onClick={() => {
-                    void logout().then(() => {
-                      window.location.assign("/");
-                    });
+                    void logout().then(() => window.location.assign("/"));
                   }}
                 >
                   [ SIGN OUT ]

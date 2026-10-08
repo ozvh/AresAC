@@ -15,7 +15,7 @@ type Row = { readonly label: string; readonly value: string; readonly gloss: str
 
 export default function TuningPanel(): JSX.Element {
   const state = useConsole();
-  const tuning = state.tuning;
+  const { tuning } = state;
 
   const rows: readonly Row[] =
     tuning === null

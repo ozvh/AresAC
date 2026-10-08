@@ -315,7 +315,7 @@ class Telemetry {
       const counters = frame["ctr"] as PublicCounters | undefined;
       if (subjects !== undefined) this.#subjects = subjects as PublicSubject[];
       if (counters !== undefined) this.#setCounters(counters);
-      const corpus = frame["corpus"];
+      const { corpus } = frame;
       if (typeof corpus === "number") this.#corpus = corpus;
       if (this.#link !== "LIVE") this.#link = "LIVE";
       this.#scheduleCommit();

@@ -200,9 +200,9 @@ export default function Architecture(): JSX.Element {
       <div className="grid gap-8 lg:grid-cols-[minmax(300px,400px)_1fr]">
         <Reveal className="relative">
           <div className="relative flex flex-col gap-4 pl-6">
-            <div className="absolute left-[5px] top-4 bottom-4 w-px bg-gradient-to-b from-line-2 via-volt/40 to-line-2" />
-            <span className="packet-dot absolute left-[2.5px] h-1.5 w-1.5 rounded-full bg-volt shadow-[0_0_12px_rgba(239,121,94,0.9)]" />
-            <span className="packet-dot absolute left-[2.5px] h-1.5 w-1.5 rounded-full bg-viol shadow-[0_0_12px_rgba(201,167,119,0.9)] [animation-delay:1.55s]" />
+            <div className="absolute left-[5px] inset-y-4 w-px bg-gradient-to-b from-line-2 via-volt/40 to-line-2" />
+            <span className="packet-dot absolute left-[2.5px] size-1.5 rounded-full bg-volt shadow-[0_0_12px_rgba(239,121,94,0.9)]" />
+            <span className="packet-dot absolute left-[2.5px] size-1.5 rounded-full bg-viol shadow-[0_0_12px_rgba(201,167,119,0.9)] [animation-delay:1.55s]" />
 
             {RINGS.map((entry, index) => {
               const active = index === selected;
@@ -217,7 +217,7 @@ export default function Architecture(): JSX.Element {
                   className={`${BUTTON_BASE} ${active ? entry.selectedButton : BUTTON_IDLE}`}
                 >
                   <span className={`${ICON_BASE} ${active ? entry.selectedIcon : ICON_IDLE}`}>
-                    <Ic name={entry.glyph} strokeWidth={1.8} className="h-5 w-5" />
+                    <Ic name={entry.glyph} strokeWidth={1.8} className="size-5" />
                   </span>
                   <span className="flex-1">
                     <span className={active ? entry.selectedLabel : LABEL_IDLE}>{entry.tag}</span>
@@ -233,7 +233,7 @@ export default function Architecture(): JSX.Element {
           </div>
 
           <div className="mt-6 hidden border border-line bg-ink/40 p-4 font-mono text-[10px] leading-relaxed tracking-[0.14em] text-mist lg:block">
-            <span className="text-volt">// SELECTION PROTOCOL</span>
+            <span className="text-volt">{"// SELECTION PROTOCOL"}</span>
             <br />
             Each ring reports independently; the arbiter convicts only on cross-ring corroboration or behavioral
             certainty.
@@ -243,7 +243,7 @@ export default function Architecture(): JSX.Element {
         <Reveal className="min-h-[560px]">
           <Reveal key={ring.tag} variant="blur" className="panel relative h-full overflow-hidden clip-notch">
             <span className={ring.bar} />
-            <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(239,121,94,0.09),transparent_65%)]" />
+            <div className="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full bg-[radial-gradient(circle,rgba(239,121,94,0.09),transparent_65%)]" />
 
             <div className="relative flex h-full flex-col p-7 md:p-10">
               <div className="flex flex-wrap items-start justify-between gap-6">

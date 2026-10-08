@@ -259,7 +259,7 @@ export default function BuildRequest(): JSX.Element {
           {/* Honeypot. Removed from the tab order and from the accessibility tree; a
               person cannot reach it, a form-filling script will. Not display:none,
               because some scripts skip undisplayed fields. */}
-          <div aria-hidden="true" className="absolute -left-[9999px] top-0 h-0 w-0 overflow-hidden">
+          <div aria-hidden="true" className="absolute left-[-9999px] top-0 size-0 overflow-hidden">
             <label htmlFor="br-trap">leave this field empty</label>
             <input
               id="br-trap"

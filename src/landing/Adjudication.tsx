@@ -172,15 +172,15 @@ export default function Adjudication(): JSX.Element {
         <div className="grid gap-14 lg:grid-cols-[1fr_360px] xl:grid-cols-[1fr_400px]">
           <div className="relative">
             {/* The spine: one hairline behind all four cards, with a single pulse travelling it. */}
-            <div className="absolute bottom-2 left-[23px] top-2 w-px bg-gradient-to-b from-volt/50 via-line-2 to-bolt/40" />
-            <span className="spine-pulse absolute left-[20px] h-2 w-2 rounded-full bg-volt shadow-[0_0_16px_rgba(239,121,94,1)]" />
+            <div className="absolute left-[23px] inset-y-2 w-px bg-gradient-to-b from-volt/50 via-line-2 to-bolt/40" />
+            <span className="spine-pulse absolute left-[20px] size-2 rounded-full bg-volt shadow-[0_0_16px_rgba(239,121,94,1)]" />
 
             <div className="flex flex-col gap-10">
               {GATES.map((gate) => (
                 <Reveal key={gate.title} className="relative flex gap-5 md:gap-7">
                   <div className="relative z-10 flex w-12 shrink-0 justify-center">
-                    <span className="grid h-12 w-12 place-items-center border border-line-2 bg-ink text-volt clip-notch">
-                      <Ic name={gate.icon} strokeWidth={1.8} className="h-5 w-5" />
+                    <span className="grid size-12 place-items-center border border-line-2 bg-ink text-volt clip-notch">
+                      <Ic name={gate.icon} strokeWidth={1.8} className="size-5" />
                     </span>
                   </div>
 
@@ -210,7 +210,7 @@ export default function Adjudication(): JSX.Element {
                         {gate.next !== null ? (
                           <div className="flex items-center gap-3 font-mono text-[11px] tracking-[0.18em] text-mist">
                             <span className="border border-dashed border-line-2 px-2.5 py-1">{gate.next}</span>
-                            <Ic name="arrow-down" className="h-3.5 w-3.5 text-volt" />
+                            <Ic name="arrow-down" className="size-3.5 text-volt" />
                             <span className="text-volt">NEXT GATE</span>
                             <span className="h-px flex-1 bg-line" />
                           </div>
@@ -236,9 +236,9 @@ export default function Adjudication(): JSX.Element {
                 />
                 <span className="pointer-events-none absolute inset-x-0 top-0 h-full animate-scanline bg-gradient-to-b from-transparent via-volt/[0.08] to-transparent" />
                 <div className="absolute left-5 top-5 flex items-center gap-2 border border-line bg-abyss/70 px-3 py-1.5 font-mono text-[10px] tracking-[0.28em] text-volt backdrop-blur">
-                  <Ic name="scale" className="h-3.5 w-3.5" /> THE ADJUDICATOR
+                  <Ic name="scale" className="size-3.5" /> THE ADJUDICATOR
                 </div>
-                <div className="absolute bottom-3 left-5 right-5">
+                <div className="absolute bottom-3 inset-x-5">
                   <p className="font-display text-2xl font-bold leading-tight text-white">
                     The burden of proof is on the machine.
                   </p>

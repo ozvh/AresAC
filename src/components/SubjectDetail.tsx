@@ -69,7 +69,7 @@ function Line({ label, children }: { label: string; children: ReactNode }): JSX.
 
 export default function SubjectDetail(): JSX.Element {
   const state = useConsole();
-  const selected = state.selected;
+  const { selected } = state;
   const [evidence, setEvidence] = useState<EvidenceState>({ phase: "idle" });
   const [outcome, setOutcome] = useState("");
   const authorised = hasOperatorToken();

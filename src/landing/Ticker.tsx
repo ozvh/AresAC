@@ -40,7 +40,7 @@ function Half(): JSX.Element {
       {ITEMS.map((item) => (
         <span key={item} className="flex items-center whitespace-nowrap">
           <span className="px-8 font-mono text-xs tracking-[0.3em] text-mist transition-colors hover:text-white">{item}</span>
-          <Ic name="shield-half" strokeWidth={2.5} className="h-3 w-3 shrink-0 text-volt/70" />
+          <Ic name="shield-half" strokeWidth={2.5} className="size-3 shrink-0 text-volt/70" />
         </span>
       ))}
     </div>

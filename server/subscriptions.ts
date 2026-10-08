@@ -71,8 +71,7 @@ export function parseCancel(raw: string): { ok: true; input: CancelInput } | { o
   for (const key of CANCEL_FIELDS) {
     if (!Object.hasOwn(record, key)) return { ok: false, code: "SCHEMA", msg: `missing field ${key}` };
   }
-  const subId = record["subId"];
-  const confirm = record["confirm"];
+  const { subId, confirm } = record;
   if (typeof subId !== "string" || !/^[0-9a-f]{32}$/.test(subId)) {
     return { ok: false, code: "SCHEMA", msg: "subId is not a subscription identifier" };
   }
@@ -226,6 +225,7 @@ export class Subscriptions {
         "",
       ].join("\n");
 
+      // eslint-disable-next-line no-await-in-loop -- Bounded reminders are sent one at a time to avoid bursts at the configured relay.
       const outcome = await this.#mailer.deliver({
         to: user.email,
         from: this.#mailer.from,

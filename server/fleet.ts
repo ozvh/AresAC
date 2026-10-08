@@ -307,8 +307,8 @@ export class Fleet {
     now: number,
   ): { c: EvidenceCode; r: Role; ring: RingId; m: number } {
     const base = this.#weightedCode(session);
-    let code = base.c;
-    let role = base.r;
+    let { c: code } = base;
+    let { r: role } = base;
 
     if (scenario === "AIMBOT_ONLY") {
       code = "X8";

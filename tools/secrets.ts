@@ -64,7 +64,7 @@ const ENV_TEMPLATE = ".env.example";
 const KEY_EXT: readonly string[] = [".pem", ".key", ".p12", ".pfx", ".jks"];
 
 /** The allowance marker, assembled so this file does not trip its own rule. */
-const ALLOW = "ares-secrets" + ":allow";
+const ALLOW = ["ares-secrets", ":allow"].join("");
 const ALLOW_TAIL: RegExp = /^\s*:\s*(\S.*)$/;
 const CODE_EXT = /\.(ts|tsx|mts|cts|js|mjs|cjs|jsx|sh|ps1)$/;
 
@@ -106,7 +106,7 @@ const PROVIDERS: ReadonlyArray<{ readonly label: string; readonly shape: RegExp 
   { label: "a GitHub token", shape: /(ghp|gho|ghs|ghr)_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}/ },
   { label: "an OpenAI-style key", shape: /sk-[A-Za-z0-9]{20,}/ },
   { label: "a Stripe secret key", shape: /(sk|rk)_(live|test)_[A-Za-z0-9]{16,}/ },
-  { label: "a Google API key", shape: /AIza[0-9A-Za-z_\-]{35}/ },
+  { label: "a Google API key", shape: /AIza[0-9A-Za-z_-]{35}/ },
   { label: "a Slack token", shape: /xox[baprs]-[A-Za-z0-9-]{10,}/ },
 ];
 
@@ -190,7 +190,7 @@ function allowance(rel: string, line: string): string | null {
   if (at < 0) return null;
   const tail = ALLOW_TAIL.exec(line.slice(at + ALLOW.length));
   if (tail === null) return "";
-  const reason = tail[1];
+  const [, reason] = tail;
   return reason === undefined ? "" : reason.trim();
 }
 
@@ -227,7 +227,7 @@ function printedEnvironmentValue(line: string): string | null {
   ENV_READ.lastIndex = 0;
   let match = ENV_READ.exec(line);
   while (match !== null) {
-    const reference = match[0];
+    const [reference] = match;
     const after = line.slice(match.index + reference.length);
     const before = line.slice(0, match.index).trimEnd();
     const tested = PRESENCE_TEST.test(after) || ENV_WRITE.test(after) || before.endsWith("typeof");

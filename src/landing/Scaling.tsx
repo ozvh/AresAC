@@ -275,11 +275,11 @@ export default function Scaling(): JSX.Element {
                   </div>
                   <p className="col-span-4 text-sm leading-relaxed text-mist md:pr-6">{entry.mechanics}</p>
                   <div className="col-span-3 flex gap-3 md:pr-6">
-                    <Ic name="trending-up" className="mt-0.5 h-4 w-4 shrink-0 text-mint" />
+                    <Ic name="trending-up" className="mt-0.5 size-4 shrink-0 text-mint" />
                     <p className="text-sm leading-relaxed text-white/80">{entry.strength}</p>
                   </div>
                   <div className="col-span-2 flex gap-3">
-                    <Ic name="triangle-alert" className="mt-0.5 h-4 w-4 shrink-0 text-bolt" />
+                    <Ic name="triangle-alert" className="mt-0.5 size-4 shrink-0 text-bolt" />
                     <p className="text-sm leading-relaxed text-mist/80">{entry.price}</p>
                   </div>
                 </div>
@@ -288,7 +288,7 @@ export default function Scaling(): JSX.Element {
 
             <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border border-line bg-ink/50 px-6 py-4 font-mono text-[10px] tracking-[0.18em] text-mist">
               <span className="flex items-center gap-2">
-                <Ic name="terminal" className="h-3.5 w-3.5 text-volt" />
+                <Ic name="terminal" className="size-3.5 text-volt" />
                 BUILD CHAIN — VISUAL STUDIO 2022 · MSVC v143 · WDK 10.0.22621 · EV ATTESTATION SIGNING
               </span>
               <span className="text-mint">ALL RINGS GREEN</span>
@@ -299,9 +299,9 @@ export default function Scaling(): JSX.Element {
             <div className="panel flex h-full min-h-[460px] flex-col overflow-hidden">
               <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
                 <div className="flex items-center gap-2">
-                  <span className="h-2.5 w-2.5 rounded-full bg-blood/70"></span>
-                  <span className="h-2.5 w-2.5 rounded-full bg-bolt/70"></span>
-                  <span className="h-2.5 w-2.5 rounded-full bg-mint/70"></span>
+                  <span className="size-2.5 rounded-full bg-blood/70"></span>
+                  <span className="size-2.5 rounded-full bg-bolt/70"></span>
+                  <span className="size-2.5 rounded-full bg-mint/70"></span>
                 </div>
                 <span className="font-mono text-[10px] tracking-[0.22em] text-mist">
                   ares@olympus-arbiter — adjudication feed

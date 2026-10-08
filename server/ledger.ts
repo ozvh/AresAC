@@ -179,8 +179,7 @@ export class Ledger {
     }
     if (ok) {
       const verdict = verifyRecords(records);
-      ok = verdict.ok;
-      at = verdict.at;
+      ({ ok, at } = verdict);
     }
 
     const last = rows[rows.length - 1];

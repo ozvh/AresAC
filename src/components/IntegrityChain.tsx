@@ -50,7 +50,7 @@ function LedgerRow({ record }: { record: LedgerView }): JSX.Element {
 
 export default function IntegrityChain(): JSX.Element {
   const state = useConsole();
-  const chain = state.chain;
+  const { chain } = state;
   const sealed = chain === null ? 0 : chain.sealed;
   const broken = chain !== null && chain.broken;
 

@@ -39,10 +39,7 @@ export function score(value: number): string {
 /** Wall clock with millisecond resolution, fixed width. */
 export function clock(ts: number): string {
   const d = new Date(ts);
-  return (
-    `${padZero(d.getHours(), 2)}:${padZero(d.getMinutes(), 2)}:${padZero(d.getSeconds(), 2)}.` +
-    padZero(d.getMilliseconds(), 3)
-  );
+  return `${padZero(d.getHours(), 2)}:${padZero(d.getMinutes(), 2)}:${padZero(d.getSeconds(), 2)}.${padZero(d.getMilliseconds(), 3)}`;
 }
 
 /** Duration as a fixed-width, unit-suffixed cell. */

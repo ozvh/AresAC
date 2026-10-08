@@ -42,8 +42,7 @@ function Cell({ label, value, tone = "text-fg" }: { label: string; value: string
 
 export default function StatusBar(): JSX.Element {
   const state = useConsole();
-  const counters = state.counters;
-  const chain = state.chain;
+  const { counters, chain } = state;
 
   const ingestAge = state.lastFrameAt === 0 ? "—" : duration(Date.now() - state.lastFrameAt);
   // The broken-chain flag is a critical state condition and the only reason this

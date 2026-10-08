@@ -19,7 +19,7 @@ const GRID = "grid grid-cols-[20px_46px_56px_minmax(0,1fr)] items-center gap-x-2
 
 export default function RejectionMatrix(): JSX.Element {
   const state = useConsole();
-  const counters = state.counters;
+  const { counters } = state;
 
   const counts = REJECTION_CLASSES.map((cls) => (counters === null ? 0 : counters[cls.field]));
   const total = counts.reduce((sum, value) => sum + value, 0);

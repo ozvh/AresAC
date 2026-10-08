@@ -136,7 +136,7 @@ type Approach = {
 type Principal = { agent: Agent; role: Role; digest: string; seq: number };
 
 function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise((resolve) => { setTimeout(resolve, ms); });
 }
 
 async function run(base: string, registry: AgentRegistry, setup: Approach): Promise<void> {
@@ -167,7 +167,7 @@ async function run(base: string, registry: AgentRegistry, setup: Approach): Prom
 
   const startedAt = Date.now();
   const deadline = startedAt + setup.seconds * 1000;
-  const batch = setup.batch;
+  const { batch } = setup;
   // Closed-loop pacing: requests are only issued when the target rate says they are
   // due, so the offered rate is controlled rather than whatever the event loop gives.
   const expectedRequestsPerSecond = setup.target / batch;
@@ -220,6 +220,7 @@ async function run(base: string, registry: AgentRegistry, setup: Approach): Prom
         if (Date.now() >= deadline) return;
         const elapsedSeconds = (Date.now() - startedAt) / 1000;
         if (issued >= elapsedSeconds * expectedRequestsPerSecond) {
+          // eslint-disable-next-line no-await-in-loop -- Pacing and concurrency limits deliberately wait before generating more requests.
           await sleep(1);
           continue;
         }
@@ -227,6 +228,7 @@ async function run(base: string, registry: AgentRegistry, setup: Approach): Prom
         const principal = mine[cursor % mine.length];
         cursor += 1;
         if (principal === undefined) return;
+        // eslint-disable-next-line no-await-in-loop -- Pacing and concurrency limits deliberately wait before generating more requests.
         await oneRequest(principal);
       }
     }),
@@ -258,7 +260,8 @@ async function run(base: string, registry: AgentRegistry, setup: Approach): Prom
       `  subjects tracked    ${snap.counters.subj}   evicted ${snap.counters.evicted}   convictions ${snap.counters.conv}`,
       `  ledger chain        ${snap.chain.sealed} sealed, ${snap.chain.broken ? "BROKEN" : "verified"}`,
       `  arbiter event rate  ${snap.counters.tps} evt/s accepted (1 observer attached)`,
-    ].join("\n") + "\n",
+      "",
+    ].join("\n"),
   );
 }
 
@@ -272,8 +275,8 @@ async function main(): Promise<void> {
   const runtime = makeRuntime({ arbiter, ledger, bus, registry, fleet });
   const server = createArbiterServer({ runtime, consoleOrigins: [], staticDir: null });
 
-  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-  const port = (server.address() as AddressInfo).port;
+  await new Promise<void>((resolve) => { server.listen(0, "127.0.0.1", resolve); });
+  const { port } = (server.address() as AddressInfo);
   const base = `http://127.0.0.1:${port}`;
   runtime.start();
 
@@ -289,7 +292,7 @@ async function main(): Promise<void> {
   });
 
   runtime.stop();
-  await new Promise<void>((resolve) => server.close(() => resolve()));
+  await new Promise<void>((resolve) => { server.close(() => resolve()); });
 
   // Fresh process-level state for the load phase, so the probe's refusals cannot
   // flatter or distort the throughput numbers.
@@ -300,8 +303,8 @@ async function main(): Promise<void> {
   const fleet2 = new Fleet(registry2, { sessions: 1, tps: 0, origin: "http://127.0.0.1:1", seed: 1 });
   const runtime2 = makeRuntime({ arbiter: arbiter2, ledger: ledger2, bus: bus2, registry: registry2, fleet: fleet2 });
   const server2 = createArbiterServer({ runtime: runtime2, consoleOrigins: [], staticDir: null });
-  await new Promise<void>((resolve) => server2.listen(0, "127.0.0.1", resolve));
-  const port2 = (server2.address() as AddressInfo).port;
+  await new Promise<void>((resolve) => { server2.listen(0, "127.0.0.1", resolve); });
+  const { port: port2 } = (server2.address() as AddressInfo);
   runtime2.start();
   await run(`http://127.0.0.1:${port2}`, registry2, {
     label: "LOAD — enough principals that rate limiting is not binding",
@@ -313,7 +316,7 @@ async function main(): Promise<void> {
   });
 
   runtime2.stop();
-  await new Promise<void>((resolve) => server2.close(() => resolve()));
+  await new Promise<void>((resolve) => { server2.close(() => resolve()); });
   process.stdout.write("\n");
   process.exit(0);
 }

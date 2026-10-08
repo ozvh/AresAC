@@ -157,8 +157,8 @@ export default function CollateralZero(): JSX.Element {
             className="group relative flex flex-col border border-line bg-ink/70 p-7 transition-all duration-500 hover:border-line-2 hover:bg-panel clip-notch"
           >
             <div className="flex items-center gap-4">
-              <span className="grid h-11 w-11 place-items-center border border-line bg-panel text-bolt transition-colors duration-300 group-hover:border-bolt/40 clip-notch">
-                <Ic name={item.icon} strokeWidth={1.7} className="h-5 w-5" />
+              <span className="grid size-11 place-items-center border border-line bg-panel text-bolt transition-colors duration-300 group-hover:border-bolt/40 clip-notch">
+                <Ic name={item.icon} strokeWidth={1.7} className="size-5" />
               </span>
               <span className="font-mono text-[11px] tracking-[0.26em] text-bolt">{item.kicker}</span>
             </div>
@@ -231,7 +231,7 @@ export default function CollateralZero(): JSX.Element {
                 </div>
                 {/* No arrow after the last rung: conviction is where the ladder stops. */}
                 {index < LADDER.length - 1 ? (
-                  <Ic name="arrow-right" className="mx-2 h-3.5 w-3.5 shrink-0 text-mist/40" />
+                  <Ic name="arrow-right" className="mx-2 size-3.5 shrink-0 text-mist/40" />
                 ) : null}
               </div>
             ))}

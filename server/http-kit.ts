@@ -140,7 +140,7 @@ export function readBody(req: IncomingMessage, cap: number): Promise<BodyResult>
  * read a response cross-origin — the check admits the request, it does not grant access.
  */
 export function originAllowed(req: IncomingMessage, allowed: readonly string[]): boolean {
-  const origin = req.headers.origin;
+  const { origin } = req.headers;
   if (typeof origin !== "string") return true;
   return allowed.includes(origin);
 }

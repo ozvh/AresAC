@@ -88,11 +88,18 @@ be stale instead of silently producing batches that come back as an indistinguis
 from a published string is published; a real build must exchange a per-agent key over a channel
 it can authenticate, and must never contain a master key.
 
-## Not verified here
+## Verification
 
-There is no Unity editor and no .NET SDK in this repository's development environment, so these
-files are **not compiled by `npm run typecheck`, `npm test` or CI**. What *is* verified is the
-recipe they implement: the canonical string, the HMAC, the agent derivation and the full HTTP
-path are exercised by `tests/unity-demo.test.ts` and by `npm run demo:unity`, which drives the
-same bytes from Node. If you change the wire format, change `tools/demo-agents.ts` too — the
-test will tell you when the two have drifted.
+`tests/unity-wire.test.ts` compiles the actual Unity-independent `AresWire.cs` when
+the Windows .NET Framework C# compiler is available. It checks agent derivation,
+canonical bytes and signatures against the Node implementation, and verifies that
+mutating a returned key copy cannot change later signatures. On other hosts this
+test reports an explicit skip. `AresAgent.Key` returns a defensive copy.
+
+`tests/unity-demo.test.ts` exercises the real HTTP path, including accepted batches,
+forged-ring rejection and conviction. If the wire format changes, update
+`tools/demo-agents.ts` too; these tests detect drift.
+
+There is no Unity editor in this environment. The transport and MonoBehaviour
+still require an editor compile and Play Mode test in the target Unity version.
+`npm run typecheck` checks TypeScript, not the Unity scripts.

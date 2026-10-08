@@ -30,12 +30,12 @@
  *  5. RETENTION. Every row carries an expiry and the sweeper deletes the file and then
  *     marks the row. The privacy policy states the window, and it is the same number.
  */
-import { randomBytes } from "node:crypto";
-import { createHash } from "node:crypto";
+import { randomBytes, createHash } from "node:crypto";
 import { mkdirSync, statfsSync } from "node:fs";
 import { rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { Store, type UploadVerdict } from "./db.ts";
+import { hasForbiddenControl } from "./text-policy.ts";
 
 /** Decoded ceiling. Small on purpose: this is for a log excerpt, not a game build. */
 export const UPLOAD_MAX_BYTES = 256 * 1024;
@@ -46,7 +46,6 @@ export const UPLOAD_MAX_BASE64 = Math.ceil(UPLOAD_MAX_BYTES / 3) * 4 + 64;
 export const UPLOAD_KEYS = ["name", "type", "data", "requestRef"] as const;
 
 const NAME_MAX = 120;
-const CONTROL = /[\u0000-\u001f\u007f]/;
 
 /**
  * Extensions that are stored. Everything absent from this list is refused rather than
@@ -214,7 +213,7 @@ export function activeContent(buffer: Buffer): string | null {
 /** Reduce a client-supplied filename to something that cannot influence a path. */
 export function sanitiseName(raw: string): { readonly base: string; readonly extension: string } | null {
   if (raw.length === 0 || raw.length > NAME_MAX) return null;
-  if (CONTROL.test(raw)) return null;
+  if (hasForbiddenControl(raw)) return null;
   // Both separators, so a Windows-style path is stripped on a POSIX host as well.
   const tail = raw.split(/[\\/]/).pop() ?? "";
   const base = tail.replace(/^\.+/, "").trim();
@@ -262,10 +261,7 @@ export function parseUpload(raw: string): ParsedUpload {
     if (!Object.hasOwn(record, key)) return { ok: false, code: "SCHEMA", msg: `missing field ${key}` };
   }
 
-  const name = record["name"];
-  const type = record["type"];
-  const data = record["data"];
-  const requestRef = record["requestRef"];
+  const { name, type, data, requestRef } = record;
 
   if (typeof name !== "string") return { ok: false, code: "SCHEMA", msg: "name must be a string" };
   if (typeof type !== "string" || !DECLARABLE.has(type)) {
@@ -545,6 +541,7 @@ export class UploadService {
     const expired = this.#store.expiredUploads(now, limit);
     let removed = 0;
     for (const row of expired) {
+      // eslint-disable-next-line no-await-in-loop -- Bounded retention work deletes each file before updating its database record.
       if (row.stored_name !== "-" && !(await this.#files.remove(row.stored_name))) continue;
       this.#store.markUploadDeleted(row.id, now);
       this.#store.audit({

@@ -72,8 +72,8 @@ export default function Header(): JSX.Element {
     <header className="fixed inset-x-0 top-0 z-50 transition-all duration-500 bg-transparent">
       <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-6 md:px-10">
         <a href="#top" className="group flex items-center gap-3">
-          <span className="relative grid h-9 w-9 place-items-center overflow-hidden border border-line-2 bg-panel clip-notch">
-            <Ic name="shield-half" strokeWidth={2.4} className="h-4.5 w-4.5 text-volt transition-transform duration-300 group-hover:scale-125" />
+          <span className="relative grid size-9 place-items-center overflow-hidden border border-line-2 bg-panel clip-notch">
+            <Ic name="shield-half" strokeWidth={2.4} className="size-4.5 text-volt transition-transform duration-300 group-hover:scale-125" />
             <span className="absolute inset-0 animate-pulse-ring rounded-full border border-volt/40" />
           </span>
           <span className="flex flex-col leading-none">
@@ -94,9 +94,9 @@ export default function Header(): JSX.Element {
 
         <div className="flex items-center gap-5">
           <div className="hidden items-center gap-2.5 font-mono text-[10px] tracking-[0.18em] text-mist md:flex">
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mint opacity-60" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-mint" />
+            <span className="relative flex size-1.5">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-mint opacity-60" />
+              <span className="relative inline-flex size-1.5 rounded-full bg-mint" />
             </span>
             DEVELOPMENT BUILD · <span className="text-volt tabular-nums">{now}</span>
           </div>
@@ -105,7 +105,7 @@ export default function Header(): JSX.Element {
             className="group flex items-center gap-2 border border-volt/40 bg-volt/10 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.22em] text-volt transition-all duration-300 hover:bg-volt hover:text-abyss hover:shadow-[0_0_30px_rgba(239,121,94,0.4)] clip-notch"
           >
             Deploy
-            <Ic name="arrow-up-right" className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            <Ic name="arrow-up-right" className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </a>
         </div>
       </div>

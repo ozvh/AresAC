@@ -97,10 +97,7 @@ async function get(path: string): Promise<Outcome<unknown>> {
 
 function readUser(value: unknown): AccountUser | null {
   if (!isRecord(value)) return null;
-  const email = value["email"];
-  const displayName = value["displayName"];
-  const role = value["role"];
-  const must = value["mustChangePassword"];
+  const { email, displayName, role, mustChangePassword: must } = value;
   if (typeof email !== "string" || typeof displayName !== "string") return null;
   if (role !== "CUSTOMER" && role !== "ADMIN") return null;
   if (typeof must !== "boolean") return null;
@@ -109,10 +106,7 @@ function readUser(value: unknown): AccountUser | null {
 
 function readSubscription(value: unknown): SubscriptionView | null {
   if (!isRecord(value)) return null;
-  const id = value["id"];
-  const plan = value["plan"];
-  const status = value["status"];
-  const end = value["currentPeriodEnd"];
+  const { id, plan, status, currentPeriodEnd: end } = value;
   if (typeof id !== "string" || typeof end !== "number") return null;
   if (plan !== "EVALUATION" && plan !== "RETAIL" && plan !== "SOURCE") return null;
   if (status !== "ACTIVE" && status !== "CANCELLED" && status !== "EXPIRED") return null;
@@ -134,10 +128,7 @@ function readUploads(value: unknown): UploadView[] {
   const out: UploadView[] = [];
   for (const entry of value) {
     if (!isRecord(entry)) continue;
-    const id = entry["id"];
-    const name = entry["originalName"];
-    const bytes = entry["bytes"];
-    const verdict = entry["verdict"];
+    const { id, originalName: name, bytes, verdict } = entry;
     if (typeof id !== "string" || typeof name !== "string" || typeof bytes !== "number") continue;
     if (verdict !== "ACCEPTED" && verdict !== "QUARANTINED" && verdict !== "REJECTED") continue;
     out.push({
@@ -166,7 +157,7 @@ export async function refreshSession(): Promise<Session> {
     csrf = "";
     return session;
   }
-  const payload = result.value;
+  const { value: payload } = result;
   if (!isRecord(payload) || payload["ok"] !== true) {
     session = { status: "ANON" };
     return session;
@@ -190,7 +181,7 @@ export async function refreshSession(): Promise<Session> {
 export async function loadAccount(): Promise<Outcome<MeResponse>> {
   const result = await get("/v1/auth/me");
   if (!result.ok) return result;
-  const payload = result.value;
+  const { value: payload } = result;
   if (!isRecord(payload) || payload["ok"] !== true) return { ok: false, reason: "unexpected answer" };
   const user = readUser(payload["user"]);
   if (user === null) return { ok: false, reason: "unexpected answer" };
@@ -204,7 +195,7 @@ export async function loadAccount(): Promise<Outcome<MeResponse>> {
   const consents = Array.isArray(payload["consents"])
     ? payload["consents"].flatMap((entry): MeResponse["consents"] => {
         if (!isRecord(entry)) return [];
-        const kind = entry["kind"];
+        const { kind } = entry;
         if (kind !== "TERMS" && kind !== "PRIVACY" && kind !== "MARKETING") return [];
         return [
           {
@@ -232,7 +223,7 @@ export async function loadAccount(): Promise<Outcome<MeResponse>> {
 
 async function acceptAuth(result: Outcome<unknown>): Promise<Outcome<AccountUser>> {
   if (!result.ok) return result;
-  const payload = result.value;
+  const { value: payload } = result;
   if (!isRecord(payload)) return { ok: false, reason: "unexpected answer" };
   const user = readUser(payload["user"]);
   if (user === null) return { ok: false, reason: "unexpected answer" };
@@ -325,11 +316,10 @@ export async function uploadFile(file: File, requestRef: string | null): Promise
     true,
   );
   if (!result.ok) return result;
-  const payload = result.value;
+  const { value: payload } = result;
   if (!isRecord(payload) || !isRecord(payload["upload"])) return { ok: false, reason: "unexpected answer" };
-  const upload = payload["upload"];
-  const id = upload["id"];
-  const verdict = upload["verdict"];
+  const { upload } = payload;
+  const { id, verdict } = upload;
   if (typeof id !== "string" || (verdict !== "ACCEPTED" && verdict !== "QUARANTINED" && verdict !== "REJECTED")) {
     return { ok: false, reason: "unexpected answer" };
   }
@@ -364,7 +354,7 @@ export type AdminSummary = {
 export async function loadAdminSummary(): Promise<Outcome<AdminSummary>> {
   const result = await get("/v1/admin/summary");
   if (!result.ok) return result;
-  const payload = result.value;
+  const { value: payload } = result;
   if (!isRecord(payload)) return { ok: false, reason: "unexpected answer" };
   const accounts = isRecord(payload["accounts"]) ? payload["accounts"] : {};
   const audit = isRecord(payload["audit"]) ? payload["audit"] : {};
@@ -389,16 +379,12 @@ export async function loadAdminSummary(): Promise<Outcome<AdminSummary>> {
 export async function loadAdminUsers(): Promise<Outcome<AdminUserView[]>> {
   const result = await get("/v1/admin/users");
   if (!result.ok) return result;
-  const payload = result.value;
+  const { value: payload } = result;
   if (!isRecord(payload) || !Array.isArray(payload["users"])) return { ok: false, reason: "unexpected answer" };
   const out: AdminUserView[] = [];
   for (const entry of payload["users"]) {
     if (!isRecord(entry)) continue;
-    const id = entry["id"];
-    const email = entry["email"];
-    const displayName = entry["displayName"];
-    const role = entry["role"];
-    const status = entry["status"];
+    const { id, email, displayName, role, status } = entry;
     if (typeof id !== "string" || typeof email !== "string" || typeof displayName !== "string") continue;
     if (role !== "CUSTOMER" && role !== "ADMIN") continue;
     if (status !== "ACTIVE" && status !== "SUSPENDED" && status !== "CLOSED") continue;
@@ -418,15 +404,12 @@ export async function loadAdminUsers(): Promise<Outcome<AdminUserView[]>> {
 export async function loadAdminAudit(): Promise<Outcome<AdminAuditView[]>> {
   const result = await get("/v1/admin/audit");
   if (!result.ok) return result;
-  const payload = result.value;
+  const { value: payload } = result;
   if (!isRecord(payload) || !Array.isArray(payload["audit"])) return { ok: false, reason: "unexpected answer" };
   const out: AdminAuditView[] = [];
   for (const entry of payload["audit"]) {
     if (!isRecord(entry)) continue;
-    const seq = entry["seq"];
-    const action = entry["action"];
-    const actorRole = entry["actorRole"];
-    const outcome = entry["outcome"];
+    const { seq, action, actorRole, outcome } = entry;
     if (typeof seq !== "number" || typeof action !== "string") continue;
     if (actorRole !== "ANON" && actorRole !== "CUSTOMER" && actorRole !== "ADMIN" && actorRole !== "SYSTEM") continue;
     if (outcome !== "OK" && outcome !== "REFUSED") continue;
